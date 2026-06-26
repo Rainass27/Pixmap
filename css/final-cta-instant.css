@@ -1,0 +1,23 @@
+/* ============================================================
+   FINAL CTA + FOOTER — smooth fade-in from the bottom
+   On first entry the closing sentence, Download button and footer
+   slide up and fade in together for a clean, professional finish.
+   Once shown, they stay visible for the rest of the session.
+   ============================================================ */
+
+#finalCta {
+  opacity: 0;
+  transform: translateY(56px);
+  transition:
+    opacity 0.9s ease,
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+#finalCta.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Footer stays in normal document flow — it simply follows the CTA
+   as the page ends, with no independent animation. */

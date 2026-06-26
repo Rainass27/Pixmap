@@ -1,0 +1,179 @@
+/* ============================================================
+   RESPONSIVE HARDENING LAYER
+   ------------------------------------------------------------
+   Loaded LAST on every page so it wins the cascade.
+   Goal: identical, perfectly-aligned experience on ANY screen
+   size — from 320px phones to 4K / ultrawide — without touching
+   the scroll-animation choreography.
+
+   Canonical breakpoints used throughout this file:
+     1280px  large desktop / small-desktop boundary
+     1024px  tablet landscape
+      768px  tablet portrait
+      600px  large phone
+      420px  standard phone
+      360px  small phone
+   This file is purely additive: delete it to revert everything.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. GLOBAL OVERFLOW + BOX-MODEL GUARD
+   The #1 cause of "everything is misaligned on my phone" is a
+   single element bleeding past the viewport width, which creates
+   a horizontal scrollbar and shifts the whole page sideways.
+   `overflow-x: clip` kills that WITHOUT creating a scroll
+   container (so it never breaks position:fixed/sticky elements,
+   unlike overflow:hidden). A hidden fallback covers old browsers.
+   ------------------------------------------------------------ */
+html {
+  overflow-x: hidden;   /* fallback for browsers without clip   */
+  overflow-x: clip;     /* preferred: no scroll-container side-effects */
+}
+
+body {
+  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ------------------------------------------------------------
+   2. MEDIA SAFETY
+   No image, video, svg or canvas may ever exceed its container
+   and force horizontal overflow. (max-width only — never touch
+   height, so images sized height:100% of a fixed parent are
+   left intact.)
+   ------------------------------------------------------------ */
+img, svg, video, canvas { max-width: 100%; }
+
+/* Long unbroken strings (URLs, codes) must wrap, not overflow. */
+p, li, h1, h2, h3, h4, h5, span, a, td, th { overflow-wrap: break-word; }
+
+/* ============================================================
+   3. HOMEPAGE — ANIMATED SCROLL EXPERIENCE (index.html)
+   These selectors only exist on the homepage, so the rules are
+   inert on every other page.
+   ============================================================ */
+
+/* ---- 3a. op1 narration sentence ----
+   It is forced to one line on desktop (white-space:nowrap) for a
+   dramatic single-line reveal. On anything narrower than a wide
+   desktop that single line runs off the screen. Allow it to wrap
+   into balanced lines — the JS reveals it word-by-word either way. */
+@media (max-width: 1024px) {
+  #op1Text {
+    white-space: normal !important;
+    width: min(88vw, 760px) !important;
+    max-width: 88vw !important;
+    line-height: 1.55 !important;
+    text-wrap: balance;
+  }
+}
+
+/* ---- 3b. Kill forced justification on narrow screens ----
+   `text-align-last: justify` stretches the final line edge-to-edge,
+   producing big ragged word-gaps on phones that read as "misaligned".
+   Switch the closing CTA + hero copy to clean centered text. */
+@media (max-width: 900px) {
+  #finalCta p {
+    text-align: center !important;
+    text-align-last: center !important;
+  }
+}
+
+/* ---- 3c. Hero tagline: prevent crowding the logo on phones ---- */
+@media (max-width: 820px) {
+  .hero-copy {
+    text-align: center !important;
+    text-align-last: center !important;
+    /* tighter leading so each paragraph occupies less vertical space
+       and clears the centred logo on shorter screens */
+    line-height: 1.7 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-copy {
+    font-size: clamp(0.82rem, 4vw, 1.05rem) !important;
+    line-height: 1.6 !important;
+    padding-left: clamp(14px, 5vw, 28px) !important;
+    padding-right: clamp(14px, 5vw, 28px) !important;
+  }
+  /* a touch more clearance top/bottom from the logo */
+  .hero-copy.left  { top: calc(var(--header-h) + 6px) !important; }
+  .hero-copy.right { bottom: clamp(28px, 5vh, 56px) !important; }
+}
+
+/* Very short screens (landscape phones): shrink copy further so the
+   two paragraphs + logo never collide. */
+@media (max-height: 560px) and (orientation: landscape) {
+  .hero-copy { font-size: clamp(0.6rem, 2.1vh, 0.8rem) !important; line-height: 1.5 !important; }
+}
+
+/* ---- 3d. USP feature cards: keep within the viewport on phones ----
+   Cards are centred (left:50% + translateX(-50%)); cap their width so
+   the 280px minimum never bumps the edges on a 320px device. */
+@media (max-width: 600px) {
+  .usp-card {
+    width: min(90vw, 360px) !important;
+    padding: 14px clamp(12px, 4vw, 20px) !important;
+  }
+  .usp-title { font-size: clamp(0.74rem, 4vw, 0.9rem) !important; }
+  .usp-desc  { font-size: clamp(0.72rem, 3.4vw, 0.82rem) !important; line-height: 1.6 !important; }
+}
+
+/* ---- 3e. Supporting feature media: never exceed the screen ---- */
+@media (max-width: 600px) {
+  #uspMedia      { width: min(82vw, 320px) !important; }
+  .usp-media-img { max-height: 26vh !important; }
+  .usp-media-lg  { max-height: 30vh !important; max-width: 82vw !important; }
+}
+
+/* ---- 3f. Floating glass panels over the output image ----
+   Hidden on phones where there is no room for them beside the image
+   (they are decorative; the image + text carry the meaning). */
+@media (max-width: 768px) {
+  .op1-panel { display: none !important; }
+}
+
+/* ============================================================
+   4. FOOTER
+   ============================================================ */
+/* The copyright requested a 'Costaline' font whose files are not
+   bundled, so it silently fell back. Pin it to the site font for a
+   consistent, intentional look. */
+.foot-right .copyright { font-family: 'OpenSans', 'Inter', sans-serif; }
+
+@media (max-width: 480px) {
+  .site-footer { padding: 40px 18px; }
+  .foot-brand p { max-width: 100%; }
+}
+
+/* ============================================================
+   5. SUBPAGE REINFORCEMENT (pricing / login / download / vjkaycee)
+   These already ship their own responsive blocks; the rules below
+   only add edge-case safety so nothing can overflow on tiny phones.
+   ============================================================ */
+
+/* Modal-style pages: keep the card inside the viewport with a safe
+   gutter on the smallest screens. */
+@media (max-width: 420px) {
+  .modal-wrapper   { margin: 14px !important; }
+  .modal-content   { padding-left: 18px !important; padding-right: 18px !important; }
+  .restore-container { margin: 14px !important; padding: 28px 22px !important; }
+}
+
+/* Pricing grid: already collapses to one column < 860px; make sure
+   cards and badges never clip on very small screens. */
+@media (max-width: 420px) {
+  .pricing-card  { padding: 28px 18px 22px !important; }
+  .popular-badge { white-space: nowrap; }
+}
+
+/* Manual page (long-form doc) only had one breakpoint — add phone
+   safety so tables, code and images stay inside the screen. */
+@media (max-width: 600px) {
+  pre, code { white-space: pre-wrap !important; word-break: break-word; }
+  table { display: block; width: 100%; overflow-x: auto; }
+}

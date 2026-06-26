@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PIX MAP User Manual</title>
+<style>
+
+/* =============================================================
+   TOKENS
+   ============================================================= */
+:root {
+  --bg:        #0c0d0f;
+  --bg2:       #111316;
+  --bg3:       #16181c;
+  --card:      #1b1e23;
+  --border:    #252830;
+  --border2:   #2e323b;
+  --accent:    #1e40af;
+  --accent-lo: rgba(30,64,175,.12);
+  --accent-mid:rgba(30,64,175,.3);
+  --green:     #22c55e;
+  --green-lo:  rgba(34,197,94,.1);
+  --amber:     #f59e0b;
+  --amber-lo:  rgba(245,158,11,.1);
+  --purple:    #8b5cf6;
+  --purple-lo: rgba(139,92,246,.1);
+  --text:      #e2e8f0;
+  --text2:     #94a3b8;
+  --text3:     #64748b;
+  --radius:    10px;
+  --nav-w:     256px;
+  --font:      'Inter', 'Segoe UI', system-ui, sans-serif;
+  --mono:      'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* =============================================================
+   RESET
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  display: flex;
+}
+img { display: block; max-width: 100%; }
+a  { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* =============================================================
+   SIDEBAR
+   ============================================================= */
+#nav {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--nav-w);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 32px;
+}
+#nav::-webkit-scrollbar { width: 3px; }
+#nav::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.nav-header {
+  padding: 28px 20px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.nav-header .logo {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--text);
+}
+.nav-header .logo span { color: var(--accent); }
+.nav-header .version {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 3px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.nav-header a.logo { text-decoration: none; display: inline-block; }
+.back-to-site {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 16px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  color: var(--text2);
+  text-decoration: none;
+  background: var(--accent-lo);
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+.back-to-site:hover {
+  color: var(--text);
+  background: var(--accent-mid);
+  border-color: var(--accent);
+}
+.back-to-site .arrow { font-size: 14px; line-height: 1; }
+
+.nav-section { padding: 20px 0 4px; }
+.nav-section-title {
+  padding: 0 20px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.nav-item {
+  display: block;
+  padding: 6px 20px;
+  font-size: 13px;
+  color: var(--text2);
+  border-left: 2px solid transparent;
+  transition: color .12s, border-color .12s, background .12s;
+  cursor: pointer;
+}
+.nav-item:hover  { color: var(--text); background: rgba(255,255,255,.03); }
+.nav-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-lo); }
+.nav-item.sub    { padding-left: 32px; font-size: 12px; }
+.nav-item.sub2   { padding-left: 44px; font-size: 11.5px; color: var(--text3); }
+.nav-item.sub2.active { color: var(--accent); }
+
+/* =============================================================
+   MAIN
+   ============================================================= */
+#page {
+  margin-left: var(--nav-w);
+  flex: 1;
+  min-height: 100vh;
+}
+
+/* =============================================================
+   COVER
+   ============================================================= */
+#cover {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 72px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* cover has no decorative overlay */
+#cover::before {
+  display: none;
+}
+
+.cover-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  position: relative;
+}
+.cover-title {
+  font-size: clamp(40px, 3.542vw, 84px); /* 68px at 1920, scales 1366→4K */
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.05;
+  color: var(--text);
+  margin-bottom: 6px;
+  position: relative;
+}
+.cover-title .highlight {
+  color: var(--accent);
+}
+.cover-subtitle {
+  font-size: clamp(15px, 1.042vw, 24px); /* 20px at 1920 */
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 48px;
+  position: relative;
+}
+.cover-rule {
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  margin-bottom: 40px;
+  position: relative;
+}
+.cover-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: relative;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+}
+.pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* =============================================================
+   CONTENT SECTIONS
+   ============================================================= */
+.section {
+  padding: 80px 72px;
+  border-bottom: 1px solid var(--border);
+}
+.section:last-child { border-bottom: none; }
+
+/* labels above headings */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: clamp(26px, 1.979vw, 46px); /* 38px at 1920 */
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 20px;
+  line-height: 1.15;
+}
+h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 52px 0 14px;
+  letter-spacing: -.01em;
+}
+h3:first-child { margin-top: 0; }
+h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin: 28px 0 10px;
+}
+
+p {
+  font-size: 15px;
+  color: var(--text2);
+  line-height: 1.85;
+  margin-bottom: 18px;
+}
+p:last-child { margin-bottom: 0; }
+
+/* =============================================================
+   COMPONENTS
+   ============================================================= */
+
+/* --- callouts --- */
+.callout {
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin: 24px 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+  position: relative;
+}
+.callout.info   { background: var(--accent-lo); border-left: 3px solid var(--accent); }
+.callout.tip    { background: var(--green-lo);  border-left: 3px solid var(--green); }
+.callout.warn   { background: var(--amber-lo);  border-left: 3px solid var(--amber); }
+.callout-label  {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 6px;
+}
+.callout.info .callout-label  { color: var(--accent); }
+.callout.tip  .callout-label  { color: var(--green); }
+.callout.warn .callout-label  { color: var(--amber); }
+
+/* --- interface zone cards --- */
+.zone-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 32px 0;
+}
+.zone-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  transition: border-color .2s;
+}
+.zone-card:hover { border-color: var(--border2); }
+.zone-card .zc-zone {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+.zone-card .zc-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.zone-card .zc-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+  max-width: none;
+  margin: 0;
+}
+.zone-card.accent { border-color: var(--accent-mid); background: var(--accent-lo); }
+.zone-card.accent .zc-zone { color: var(--accent); }
+
+/* --- property table --- */
+.ptable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0 32px;
+}
+.ptable th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text3);
+  padding: 10px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.ptable td {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  font-size: 13.5px;
+  color: var(--text2);
+  vertical-align: top;
+  line-height: 1.65;
+}
+.ptable tr:hover td { background: rgba(255,255,255,.015); }
+.ptable code {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--bg3);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* --- mask grid --- */
+.mask-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 24px 0;
+}
+.mask-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+.mask-card .mk-type {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+.mask-card .mk-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.mask-card .mk-desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* =============================================================
+   WORKFLOW
+   ============================================================= */
+#workflow-steps { padding-top: 0; }
+
+.step-block {
+  padding: 56px 72px;
+  border-bottom: 1px solid var(--border);
+}
+.step-block:last-child { border-bottom: none; }
+
+.step-head {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.step-num {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.step-info .step-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text3);
+  margin-bottom: 3px;
+}
+.step-info h3 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -.01em;
+}
+
+/* GIF container */
+.gif-wrap {
+  margin: 24px 0;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+.gif-wrap img {
+  width: 100%;
+  display: block;
+}
+.gif-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text3);
+}
+.gif-bar::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+
+/* step body text */
+.step-body p {
+  font-size: 15px;
+  color: var(--text2);
+  margin-bottom: 14px;
+}
+.step-why {
+  margin-top: 20px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  background: var(--green-lo);
+  border-left: 3px solid var(--green);
+  font-size: 13.5px;
+  color: var(--text);
+}
+.step-why strong {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--green);
+  margin-bottom: 4px;
+}
+
+/* export mode table */
+.export-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+.export-table th {
+  text-align: left;
+  padding: 10px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text3);
+}
+.export-table td {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: top;
+  line-height: 1.6;
+}
+.export-table tr:hover td { background: rgba(255,255,255,.015); }
+.export-table code {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--bg3);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* =============================================================
+   BEST PRACTICES
+   ============================================================= */
+.bp-list {
+  list-style: none;
+  margin: 28px 0 0;
+}
+.bp-list li {
+  display: flex;
+  gap: 16px;
+  padding: 18px 22px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  transition: border-color .2s;
+}
+.bp-list li:hover { border-color: var(--border2); }
+.bp-list .bp-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
+  padding-top: 1px;
+}
+.bp-list .bp-text strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.bp-list .bp-text span {
+  font-size: 13.5px;
+  color: var(--text2);
+  line-height: 1.65;
+}
+
+/* =============================================================
+   FOOTER
+   ============================================================= */
+.doc-footer {
+  padding: 40px 72px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.doc-footer .brand {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text2);
+}
+.doc-footer .brand span { color: var(--accent); }
+.doc-footer .meta {
+  font-size: 12px;
+  color: var(--text3);
+}
+
+/* =============================================================
+   SCROLLBAR
+   ============================================================= */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* =============================================================
+   RESPONSIVE
+   ============================================================= */
+@media (max-width: 860px) {
+  #nav { display: none; }
+  #page { margin-left: 0; }
+  .section, .step-block, #cover { padding: 48px 28px; }
+  .cover-title { font-size: 44px; }
+  .zone-grid, .mask-grid { grid-template-columns: 1fr; }
+  h2 { font-size: 28px; }
+}
+
+</style>
+<link rel="stylesheet" href="../../css/responsive.css?v=20260626">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     SIDEBAR NAV
+     ══════════════════════════════════════════════ -->
+<nav id="nav">
+  <div class="nav-header">
+    <a class="logo" href="../../index.html"><span>PIX</span> MAP</a>
+    <div class="version">User Manual · 2026</div>
+    <a class="back-to-site" href="../../index.html"><span class="arrow">←</span> Back to website</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Overview</div>
+    <a class="nav-item" href="#cover">Title Page</a>
+    <a class="nav-item" href="#introduction">Introduction</a>
+    <a class="nav-item" href="#interface-overview">Interface Overview</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Components</div>
+    <a class="nav-item" href="#components">Component Breakdown</a>
+    <a class="nav-item sub" href="#project-setup">Project Setup Wizard</a>
+    <a class="nav-item sub" href="#canvas-workspace">Canvas Workspace</a>
+    <a class="nav-item sub" href="#layers-panel">Layers Panel</a>
+    <a class="nav-item sub" href="#properties-panel">Properties Panel</a>
+    <a class="nav-item sub" href="#led-surfaces">LED Surfaces</a>
+    <a class="nav-item sub" href="#panel-grid">Panel Grid Editing</a>
+    <a class="nav-item sub" href="#surface-styling">Surface Styling</a>
+    <a class="nav-item sub" href="#masks">Mask Shapes</a>
+    <a class="nav-item sub" href="#custom-shape">Custom Shape Tool</a>
+    <a class="nav-item sub" href="#canvas-tools">Canvas Tools</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Workflow</div>
+    <a class="nav-item" href="#workflow">Workflow Illustration</a>
+    <a class="nav-item sub2" href="#s1">01 · New Project</a>
+    <a class="nav-item sub2" href="#s2">02 · Custom Panel</a>
+    <a class="nav-item sub2" href="#s3">03 · Upload Logo</a>
+    <a class="nav-item sub2" href="#s4">04 · First Surface</a>
+    <a class="nav-item sub2" href="#s5">05 · Multi-Surface</a>
+    <a class="nav-item sub2" href="#s6">06 · Name Surfaces</a>
+    <a class="nav-item sub2" href="#s7">07 · Color Shifter</a>
+    <a class="nav-item sub2" href="#s8">08 · Grid Edit</a>
+    <a class="nav-item sub2" href="#s9">09 · Labels</a>
+    <a class="nav-item sub2" href="#s10">10 · Fit Canvas</a>
+    <a class="nav-item sub2" href="#s11">11 · Basic Masks</a>
+    <a class="nav-item sub2" href="#s12">12 · Custom Masks</a>
+    <a class="nav-item sub2" href="#s13">13 · PNG Mask</a>
+    <a class="nav-item sub2" href="#s14">14 · Export</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Reference</div>
+    <a class="nav-item" href="#best-practices">Best Practices</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     PAGE
+     ══════════════════════════════════════════════ -->
+<div id="page">
+
+  <!-- ────────────────────────────────────────────
+       COVER
+       ──────────────────────────────────────────── -->
+  <section id="cover" class="section" style="padding: 80px 72px; min-height: 100vh; justify-content: center; display: flex; flex-direction: column; border-bottom: 1px solid var(--border); background: var(--bg); position: relative; overflow: hidden;">
+    <div style="position:relative;">
+      <div class="cover-eyebrow">Official Documentation</div>
+      <div class="cover-title">
+        <span class="highlight">PIX</span><span style="color:var(--text);"> MAP</span><br />User Manual
+      </div>
+      <p class="cover-subtitle" style="margin-top:16px; max-width:none;">
+        Professional LED pixel mapping design tool for planning,<br />
+        organizing, and exporting LED panel layouts for video walls<br />
+        and live stage productions.
+      </p>
+      <div class="cover-rule"></div>
+      <div class="cover-pills">
+        <div class="pill"><span class="dot"></span> LED Technicians</div>
+        <div class="pill"><span class="dot" style="background:var(--purple)"></span> AV Professionals</div>
+        <div class="pill"><span class="dot" style="background:var(--green)"></span> Production Designers</div>
+        <div class="pill" style="margin-left:auto; border-color:var(--border2); color:var(--text3); font-size:11px;">2026 Edition</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────────────────
+       INTRODUCTION
+       ──────────────────────────────────────────── -->
+  <section id="introduction" class="section">
+    <div class="eyebrow">01 · Introduction</div>
+    <h2>What is PIX MAP?</h2>
+
+    <p>
+      PIX MAP is a professional desktop application for designing, planning, and exporting
+      LED pixel mapping layouts. It gives LED technicians, AV engineers, and production designers
+      a dedicated visual environment to define how LED panels are physically arranged, configured,
+      and indexed, before any hardware is installed on site.
+    </p>
+    <p>
+      Modern LED installations involve dozens or hundreds of individual panel modules arranged
+      across screens, trusses, stage floors, and architectural surfaces. Each module has a
+      specific position, pixel count, and signal assignment. Planning this structure
+      accurately, and in advance, is what separates a smooth installation from an
+      expensive, time-consuming problem discovered on the day.
+    </p>
+    <p>
+      PIX MAP solves this by replacing guesswork, spreadsheets, and generic design tools with a
+      single purpose-built workspace that understands the language of LED pixel mapping.
+    </p>
+
+    <h3>Who Is PIX MAP Designed For?</h3>
+
+    <div class="zone-grid">
+      <div class="zone-card">
+        <div class="zc-zone">Primary Audience</div>
+        <div class="zc-name">LED Technicians</div>
+        <p class="zc-desc">
+          Configure panel grids, define pitch values, and produce accurate patch data that
+          reflects the exact physical arrangement of LED hardware before installation begins.
+        </p>
+      </div>
+      <div class="zone-card">
+        <div class="zc-zone">Primary Audience</div>
+        <div class="zc-name">AV Professionals</div>
+        <p class="zc-desc">
+          Map multi-surface video wall systems and generate export files compatible with
+          media servers, signal processors, and production control systems.
+        </p>
+      </div>
+      <div class="zone-card">
+        <div class="zc-zone">Primary Audience</div>
+        <div class="zc-name">Production Designers</div>
+        <p class="zc-desc">
+          Visualize LED surface arrangements within a stage or architectural context and
+          validate layout geometry, masking, and coverage before fabrication or deployment.
+        </p>
+      </div>
+      <div class="zone-card">
+        <div class="zc-zone">Primary Audience</div>
+        <div class="zc-name">Event & Stage Crews</div>
+        <p class="zc-desc">
+          Use project files and canvas layouts as on-site reference documents during LED
+          rig construction, panel hanging, and signal patching.
+        </p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ────────────────────────────────────────────
+       INTERFACE OVERVIEW
+       ──────────────────────────────────────────── -->
+  <section id="interface-overview" class="section">
+    <div class="eyebrow">02 · Interface</div>
+    <h2>Application Interface Overview</h2>
+    <p>
+      PIX MAP is organized into five distinct interface zones. Each zone has a specific role,
+      and together they provide a complete pixel mapping design environment. New users should
+      familiarize themselves with these zones before beginning a project.
+    </p>
+
+    <!-- Interface screenshot -->
+    <div style="width:100%; margin:32px 0 28px; border-radius:12px; overflow:hidden; border:1px solid var(--border); background:var(--card);">
+      <img src="X1.PNG" alt="PIX MAP application interface" style="width:100%; display:block;" />
+    </div>
+
+    <div class="zone-grid" style="grid-template-columns:1fr;">
+
+      <!-- Top Toolbar — RED -->
+      <div class="zone-card" style="display:flex;gap:18px;align-items:flex-start;border-left:3px solid #dc2626;background:rgba(220,38,38,.04);">
+        <div style="flex-shrink:0;width:42px;height:42px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.35);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#dc2626;">⊟</div>
+        <div>
+          <div class="zc-zone" style="color:#dc2626;">Top Zone</div>
+          <div class="zc-name" style="font-size:16px;margin-bottom:6px;">Top Toolbar</div>
+          <p class="zc-desc">The top toolbar contains global controls: project file actions, export access, primary tool selection, and canvas view controls. Most sessions begin here.</p>
+        </div>
+      </div>
+
+      <!-- Left Layers Panel — PURPLE -->
+      <div class="zone-card" style="display:flex;gap:18px;align-items:flex-start;border-left:3px solid #7c3aed;background:rgba(124,58,237,.04);">
+        <div style="flex-shrink:0;width:42px;height:42px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.35);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#7c3aed;">☰</div>
+        <div>
+          <div class="zc-zone" style="color:#7c3aed;">Left Zone</div>
+          <div class="zc-name" style="font-size:16px;margin-bottom:6px;">Layers Panel</div>
+          <p class="zc-desc">The left panel lists every object in the current project, including LED surfaces, groups, masks, and imported reference assets. It is the primary tool for managing project structure, ordering, and visibility.</p>
+        </div>
+      </div>
+
+      <!-- Canvas Workspace — YELLOW -->
+      <div class="zone-card" style="display:flex;gap:18px;align-items:flex-start;border-left:3px solid #ca8a04;background:rgba(202,138,4,.04);">
+        <div style="flex-shrink:0;width:42px;height:42px;background:rgba(202,138,4,.1);border:1px solid rgba(202,138,4,.35);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#ca8a04;">⊞</div>
+        <div>
+          <div class="zc-zone" style="color:#ca8a04;">Center Zone · Primary Workspace</div>
+          <div class="zc-name" style="font-size:16px;margin-bottom:6px;">Canvas Workspace</div>
+          <p class="zc-desc">The canvas is the central viewport where all LED surfaces, masks, and reference images are placed and arranged. All visual design work happens here. The canvas is always the primary focus of the interface.</p>
+        </div>
+      </div>
+
+      <!-- Right Properties Panel — GREEN -->
+      <div class="zone-card" style="display:flex;gap:18px;align-items:flex-start;border-left:3px solid #16a34a;background:rgba(22,163,74,.04);">
+        <div style="flex-shrink:0;width:42px;height:42px;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.35);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#16a34a;">⊟</div>
+        <div>
+          <div class="zc-zone" style="color:#16a34a;">Right Zone</div>
+          <div class="zc-name" style="font-size:16px;margin-bottom:6px;">Properties Panel</div>
+          <p class="zc-desc">Selecting any object on the canvas populates the right panel with all editable settings for that object. Surface dimensions, pitch, colors, labels, position, and visual styling are all configured here.</p>
+        </div>
+      </div>
+
+      <!-- Bottom LED Details Bar — DARK BLUE -->
+      <div class="zone-card" style="display:flex;gap:18px;align-items:flex-start;border-left:3px solid #1e3a8a;background:rgba(30,58,138,.04);">
+        <div style="flex-shrink:0;width:42px;height:42px;background:rgba(30,58,138,.1);border:1px solid rgba(30,58,138,.35);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#1e3a8a;">▬</div>
+        <div>
+          <div class="zc-zone" style="color:#1e3a8a;">Bottom Zone</div>
+          <div class="zc-name" style="font-size:16px;margin-bottom:6px;">LED Details Bar</div>
+          <p class="zc-desc">The bottom bar displays live technical readouts including total pixel count, panel totals, resolution summaries, and canvas coordinate data for the selected surface or the overall project.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────────────────
+       COMPONENT BREAKDOWN
+       ──────────────────────────────────────────── -->
+  <section id="components" class="section">
+    <div class="eyebrow">03 · Components</div>
+    <h2>Interface Component Breakdown</h2>
+    <p>
+      The following subsections provide detailed explanations of each interface component, what it does, where it lives in the application, and how it fits into the
+      LED mapping workflow.
+    </p>
+  </section>
+
+  <!-- Project Setup -->
+  <section id="project-setup" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Project Setup Wizard</h3>
+    <p>
+      Every PIX MAP session begins with the Project Setup Wizard. This dialog appears
+      automatically when creating a new project and collects the foundational parameters
+      that define the scale, resolution, and hardware context of the entire canvas.
+      All downstream measurements, pixel counts, and panel calculations are derived
+      from the values entered here.
+    </p>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:200px;">Setting</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Project Name</code></td>
+          <td>An identifier for the project used in saved files and export outputs. Use a clear, descriptive name that communicates the event, venue, or installation.</td>
+        </tr>
+        <tr>
+          <td><code>Resolution</code></td>
+          <td>The total output resolution of the LED canvas (e.g., 1920×1080, 3840×2160). Sets the pixel grid scale for the workspace. Must match the intended output resolution of the video system driving the LED wall.</td>
+        </tr>
+        <tr>
+          <td><code>Pixel Pitch</code></td>
+          <td>The physical distance in millimeters between LED pixels on the hardware modules. This value maps the pixel grid to real-world physical dimensions on the canvas.</td>
+        </tr>
+        <tr>
+          <td><code>Panel Presets</code></td>
+          <td>Pre-configured panel type definitions based on known LED module specifications. Selecting a preset automatically populates pitch and pixel dimension fields.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <div class="callout-label">Important</div>
+      Pixel pitch and resolution together define the physical scale of the entire canvas.
+      Always verify these values against hardware specifications before beginning layout work.
+      Incorrect pitch values will produce inaccurate pixel counts and invalid export data.
+    </div>
+  </section>
+
+  <!-- Canvas Workspace -->
+  <section id="canvas-workspace" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Canvas Workspace</h3>
+    <p>
+      The canvas is the central viewport of PIX MAP and the primary design environment
+      for LED layout work. It is an infinite, pannable, and zoomable workspace where
+      LED surfaces, masks, and reference images are placed and spatially arranged.
+    </p>
+    <p>
+      The canvas reflects the physical space of the LED installation. Surfaces are positioned
+      relative to one another in the same way physical LED panels would appear on a stage or wall.
+    </p>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:160px;">Interaction</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Pan</code></td><td>Click and drag on empty canvas space to move the viewport in any direction.</td></tr>
+        <tr><td><code>Zoom</code></td><td>Scroll the mouse wheel to zoom in or out. Zoom is centered on the cursor position.</td></tr>
+        <tr><td><code>Select</code></td><td>Click any object to select it and load its editable properties into the right panel.</td></tr>
+        <tr><td><code>Drag</code></td><td>Click and drag a selected surface or shape to reposition it anywhere on the canvas.</td></tr>
+        <tr><td><code>Multi-select</code></td><td>Hold Shift and click multiple objects to select them simultaneously for group operations.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Layers Panel -->
+  <section id="layers-panel" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Layers Panel</h3>
+    <p>
+      The layers panel is located on the left side of the interface and provides a complete,
+      hierarchical list of every object in the project. As surfaces, groups, masks, and
+      imported assets are added to the canvas, they appear here as named entries
+      that can be individually managed.
+    </p>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:180px;">Action</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Reorder</code></td><td>Drag layer entries up or down to change the stacking order of objects on the canvas.</td></tr>
+        <tr><td><code>Group</code></td><td>Combine multiple surfaces or shapes into named groups to simplify navigation in complex projects.</td></tr>
+        <tr><td><code>Visibility Toggle</code></td><td>Show or hide any layer without deleting it. Useful for comparing layout variations or temporarily clearing the view.</td></tr>
+        <tr><td><code>Lock Layer</code></td><td>Prevent a layer from being accidentally selected or repositioned on the canvas.</td></tr>
+        <tr><td><code>Rename</code></td><td>Double-click any entry to assign a custom name to a surface, group, or mask.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <div class="callout-label">Tip</div>
+      On large installations, establish a consistent naming and grouping structure from the
+      very start of the project. A well-organized layer list is significantly faster to
+      navigate and reduces the risk of accidental edits to the wrong surface.
+    </div>
+  </section>
+
+  <!-- Properties Panel -->
+  <section id="properties-panel" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Properties Panel</h3>
+    <p>
+      The properties panel is located on the right side of the interface. When an LED surface
+      is selected on the canvas, this panel populates with all configurable settings for that
+      object. Properties are updated in real time, changes are immediately reflected on the canvas.
+    </p>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:200px;">Property</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Panel Pitch</code></td><td>The LED pixel pitch in millimeters for the panels in this surface.</td></tr>
+        <tr><td><code>Panel Pixel Dimensions</code></td><td>The pixel resolution (width × height) of each individual panel module within the surface.</td></tr>
+        <tr><td><code>Rows &amp; Columns</code></td><td>The grid layout of the surface, how many panels across (columns) and how many panels tall (rows).</td></tr>
+        <tr><td><code>Position</code></td><td>The X/Y coordinates of the surface on the canvas.</td></tr>
+        <tr><td><code>Rotation</code></td><td>The rotation angle of the surface in degrees.</td></tr>
+        <tr><td><code>Label Styling</code></td><td>Font size, color, and rotation of the text label displayed on the surface within the canvas.</td></tr>
+        <tr><td><code>Fill Color</code></td><td>The background fill color of the surface.</td></tr>
+        <tr><td><code>Flip X / Flip Y</code></td><td>Mirror the surface horizontally or vertically to match the physical installation orientation.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- LED Surfaces -->
+  <section id="led-surfaces" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">LED Surfaces</h3>
+    <p>
+      An LED surface is the primary object type in PIX MAP. Each surface represents a physical
+      LED panel array, a defined grid of LED modules that together form a single display
+      region. Surfaces are the building blocks of every pixel mapping project.
+    </p>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:190px;">Attribute</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Panel Grid</code></td><td>The rows × columns arrangement of LED modules forming the surface.</td></tr>
+        <tr><td><code>Panel Pitch</code></td><td>The physical LED pitch for the modules assigned to this surface.</td></tr>
+        <tr><td><code>Panel Dimensions</code></td><td>The pixel resolution of each individual LED module within the surface.</td></tr>
+        <tr><td><code>Visual Styling</code></td><td>Color, label, border, and opacity settings controlling how the surface is rendered on the canvas.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      Projects can contain any number of surfaces. This allows multi-zone configurations, a center screen, side wings, floor tiles, and ceiling rigs, to all coexist within a
+      single project file and be exported together in one operation.
+    </p>
+  </section>
+
+  <!-- Panel Grid Editing -->
+  <section id="panel-grid" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Panel Grid Editing</h3>
+    <p>
+      By default, an LED surface is a complete rectangular grid where every cell in the
+      row × column matrix is filled with an active panel. In physical installations,
+      however, panels are frequently missing from the grid, removed to accommodate structural
+      columns, rigging hardware, architectural features, or design intent.
+    </p>
+    <p>
+      Panel grid editing mode allows users to individually select and remove panel cells
+      from a surface. Each cell can be toggled independently, active or inactive, allowing the surface grid to accurately represent a real, irregular LED array
+      rather than an idealized rectangle.
+    </p>
+
+    <div class="callout info">
+      <div class="callout-label">How It Works</div>
+      Enter panel grid editing mode by selecting a surface and activating the grid editor from
+      the surface controls. Individual cells become selectable. Click any cell to toggle it off
+      (removing it from the pixel map) or back on. Pixel counts and indexing update automatically
+      as cells are modified.
+    </div>
+  </section>
+
+  <!-- Surface Styling -->
+  <section id="surface-styling" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Surface Styling</h3>
+    <p>
+      Visual styling controls in PIX MAP determine how surfaces appear on the canvas.
+      These settings are for planning clarity only, they affect the visual representation
+      of the surface during design but do not influence the pixel mapping output data.
+    </p>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:200px;">Style Setting</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Checker Pattern</code></td><td>Alternating panel shading within the surface grid to visually distinguish individual module cells.</td></tr>
+        <tr><td><code>Label Color &amp; Size</code></td><td>The color and font size of the text label displayed on the surface.</td></tr>
+        <tr><td><code>Fill Color</code></td><td>The solid background fill applied to the entire surface area.</td></tr>
+        <tr><td><code>Label Rotation</code></td><td>Rotate the surface label text independently from the surface itself.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      Applying distinct colors to adjacent surfaces significantly improves readability on
+      complex, multi-zone canvases. The One-Click Color Shifter automates this process by
+      instantly assigning a visually distinct color palette across all surfaces.
+    </p>
+  </section>
+
+  <!-- Mask Shapes -->
+  <section id="masks" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Mask Shapes</h3>
+    <p>
+      Masks are shapes applied on top of LED surfaces to define non-rectangular active
+      display areas. In live production and event design, LED displays are frequently
+      circular, triangular, hexagonal, or entirely custom in form. PIX MAP's masking
+      system allows these shapes to be precisely defined and included in all export outputs.
+    </p>
+    <p>
+      Only the pixels within the mask boundary are included in the pixel mapping output.
+      Pixels outside the mask are excluded from indexing and from signal assignment.
+    </p>
+
+    <div class="mask-grid">
+      <div class="mask-card">
+        <div class="mk-type">Built-in</div>
+        <div class="mk-name">Rectangle</div>
+        <div class="mk-desc">Standard rectangular mask. Use to sub-crop a surface or define a precise rectangular active region within a larger panel array.</div>
+      </div>
+      <div class="mask-card">
+        <div class="mk-type">Built-in</div>
+        <div class="mk-name">Circle</div>
+        <div class="mk-desc">Circular mask for round LED display configurations, common in drum rigs, circular trusses, and halo installations.</div>
+      </div>
+      <div class="mask-card">
+        <div class="mk-type">Built-in</div>
+        <div class="mk-name">Triangle</div>
+        <div class="mk-desc">Triangular mask for angular, wedge-shaped, or V-formation LED display configurations.</div>
+      </div>
+      <div class="mask-card">
+        <div class="mk-type">Built-in</div>
+        <div class="mk-name">Hexagon</div>
+        <div class="mk-desc">Six-sided mask for hexagonal LED tile arrays, a popular format in creative panel arrangements and architectural installations.</div>
+      </div>
+      <div class="mask-card">
+        <div class="mk-type">User-Drawn</div>
+        <div class="mk-name">Custom Polygon</div>
+        <div class="mk-desc">A freeform closed polygon drawn point-by-point directly on the canvas by the user. Supports any closed shape geometry.</div>
+      </div>
+      <div class="mask-card">
+        <div class="mk-type">Imported</div>
+        <div class="mk-name">PNG Mask</div>
+        <div class="mk-desc">Import a PNG file as a mask. The alpha channel of the PNG defines the mask boundary, enabling highly complex shapes.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Custom Shape Tool -->
+  <section id="custom-shape" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Custom Shape Tool</h3>
+    <p>
+      The custom shape tool allows users to draw freeform polygon masks directly on the
+      canvas using a point-by-point drawing method. It is the most flexible masking
+      option and supports any closed shape that a specific LED installation might require.
+    </p>
+
+    <h4>Drawing a Custom Polygon Mask</h4>
+    <ol style="padding-left:20px;color:var(--text2);font-size:14.5px;line-height:2.1;">
+      <li>Select the Custom Shape tool from the toolbar or mask type menu.</li>
+      <li>Click on the canvas to place the first anchor point of the shape.</li>
+      <li>Continue clicking to place additional anchor points around the mask perimeter.</li>
+      <li>Click on the first anchor point to close the polygon and complete the mask shape.</li>
+      <li>The completed mask is applied to the LED surface beneath it.</li>
+    </ol>
+
+    <div class="callout tip">
+      <div class="callout-label">Tip</div>
+      Use the minimum number of points needed to define the shape accurately.
+      Fewer, well-placed anchor points produce cleaner masks, more predictable export results,
+      and are easier to refine and adjust after placement.
+    </div>
+  </section>
+
+  <!-- Canvas Tools -->
+  <section id="canvas-tools" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Canvas Tools</h3>
+    <p>
+      In addition to surface and mask editing, PIX MAP provides auxiliary canvas tools
+      that improve layout accuracy, assist with navigation, and help prepare the workspace
+      for export.
+    </p>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:220px;">Tool</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Snap to Alignment</code></td>
+          <td>Automatically snaps surfaces and shapes to alignment guides when dragging, making it straightforward to align objects precisely without manual coordinate entry.</td>
+        </tr>
+        <tr>
+          <td><code>Diagnostic Line View</code></td>
+          <td>Overlays pixel indexing scan lines across surfaces to visually verify the pixel numbering direction and scan-out order before export.</td>
+        </tr>
+        <tr>
+          <td><code>Canvas Lock Mode</code></td>
+          <td>Locks canvas pan and zoom to prevent accidental viewport changes while making precise edits to surfaces or masks.</td>
+        </tr>
+        <tr>
+          <td><code>Fit Canvas to Content</code></td>
+          <td>Automatically adjusts the canvas viewport to frame all placed objects within the visible window. Essential before export to confirm all surfaces are visible and correctly positioned.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <div class="callout-label">Fit Canvas to Content</div>
+      This one-click tool should be used as a standard step before every export.
+      It ensures all surfaces are within the canvas viewport and that nothing has been
+      inadvertently positioned off-screen before export data is generated.
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────────────────
+       WORKFLOW, INTRO
+       ──────────────────────────────────────────── -->
+  <section id="workflow" class="section">
+    <div class="eyebrow">04 · Workflow</div>
+    <h2>Workflow Illustration</h2>
+    <p>
+      The following walkthrough demonstrates a complete PIX MAP project, from initial
+      setup through to final export. Each step includes an animated demonstration and
+      an explanation of what is happening and why it matters in the broader
+      LED mapping workflow.
+    </p>
+    <p>
+      Follow these steps in order when starting your first project. Once familiar with
+      the workflow, individual steps can be referenced independently as needed.
+    </p>
+  </section>
+
+  <!-- ────────────────────────────────────────────
+       STEPS
+       ──────────────────────────────────────────── -->
+  <div id="workflow-steps">
+
+    <!-- S1 -->
+    <div class="step-block" id="s1">
+      <div class="step-head">
+        <div class="step-num">1</div>
+        <div class="step-info">
+          <div class="step-tag">Step 01 of 14</div>
+          <h3>Start a New Project</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          When launching a new project, the Project Setup Wizard opens and prompts for the
+          core parameters that define the mapping environment. The user enters the project
+          name, sets the output resolution, and specifies the pixel pitch of the LED hardware
+          being planned.
+        </p>
+        <div class="gif-wrap">
+          <img src="1.gif" alt="Step 1, Starting a new PIX MAP project" loading="lazy" />
+          <div class="gif-bar">Project Setup Wizard, project name, resolution, and pixel pitch</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Resolution and pixel pitch together determine the physical scale of the entire canvas.
+          Every surface, measurement, and pixel count in the project is derived from these values.
+          Setting them correctly at the start ensures all downstream data is accurate.
+        </div>
+      </div>
+    </div>
+
+    <!-- S2 -->
+    <div class="step-block" id="s2">
+      <div class="step-head">
+        <div class="step-num">2</div>
+        <div class="step-info">
+          <div class="step-tag">Step 02 of 14</div>
+          <h3>Create a Custom LED Panel Size</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          Not all LED installations use standard panel modules. When the hardware in use does
+          not match a preset in the Panel Library, users can define a custom panel specification by entering the exact pixel width, pixel height, and pitch value that corresponds to
+          the physical modules being installed.
+        </p>
+        <div class="gif-wrap">
+          <img src="2.gif" alt="Step 2, Creating a custom LED panel size" loading="lazy" />
+          <div class="gif-bar">Defining a custom panel specification, pixel dimensions and pitch</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Using the exact panel specification ensures that all pixel counts, surface dimensions,
+          and export data reflect the real hardware. Custom panel definitions can be reused
+          across multiple surfaces within the same project.
+        </div>
+      </div>
+    </div>
+
+    <!-- S3 -->
+    <div class="step-block" id="s3">
+      <div class="step-head">
+        <div class="step-num">3</div>
+        <div class="step-info">
+          <div class="step-tag">Step 03 of 14</div>
+          <h3>Upload a Brand Logo to the Canvas</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          Reference graphics, such as brand logos, sponsor artwork, or stage schematics, can be imported directly onto the canvas as visual guide layers. These images are
+          not part of the pixel mapping output and are used purely as layout references
+          during the design process.
+        </p>
+        <div class="gif-wrap">
+          <img src="3.gif" alt="Step 3, Uploading a brand logo to the canvas" loading="lazy" />
+          <div class="gif-bar">Importing a reference graphic as a canvas guide layer</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Reference imagery makes it straightforward to position LED surfaces so that panel
+          boundaries align precisely with a logo, graphic, or architectural feature.
+          For branded installations, this step eliminates alignment guesswork entirely.
+        </div>
+      </div>
+    </div>
+
+    <!-- S4 -->
+    <div class="step-block" id="s4">
+      <div class="step-head">
+        <div class="step-num">4</div>
+        <div class="step-info">
+          <div class="step-tag">Step 04 of 14</div>
+          <h3>Add the First LED Surface</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          With the canvas initialized and any reference imagery in place, the first LED surface
+          can be created. A surface is defined by specifying the number of panel rows and columns
+          and selecting the panel type. PIX MAP immediately renders the surface on the canvas
+          as a panel grid, providing a real-time visual representation of the LED array.
+        </p>
+        <div class="gif-wrap">
+          <img src="4.gif" alt="Step 4, Adding the first LED surface" loading="lazy" />
+          <div class="gif-bar">Creating the first LED surface, defining rows, columns, and panel type</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          The first surface establishes the spatial anchor of the project. All subsequent surfaces
+          are positioned relative to it. The surface can be freely repositioned on the canvas
+          at any time by dragging.
+        </div>
+      </div>
+    </div>
+
+    <!-- S5 -->
+    <div class="step-block" id="s5">
+      <div class="step-head">
+        <div class="step-num">5</div>
+        <div class="step-info">
+          <div class="step-tag">Step 05 of 14</div>
+          <h3>Add Multiple LED Surfaces</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          Most professional LED installations involve multiple independent display zones.
+          A stage production might include a main center screen, left and right wing panels,
+          floor tiles, and ceiling rigs, each representing a distinct LED surface with its
+          own panel count and configuration. In PIX MAP, each zone is added as a separate
+          surface on the canvas.
+        </p>
+        <div class="gif-wrap">
+          <img src="5.gif" alt="Step 5, Adding multiple LED surfaces" loading="lazy" />
+          <div class="gif-bar">Adding additional surfaces to represent a multi-zone LED installation</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Surfaces are independent objects. Each can have different panel types, dimensions,
+          and configurations. Arranging them spatially on the canvas creates an accurate
+          digital map of the full physical installation.
+        </div>
+      </div>
+    </div>
+
+    <!-- S6 -->
+    <div class="step-block" id="s6">
+      <div class="step-head">
+        <div class="step-num">6</div>
+        <div class="step-info">
+          <div class="step-tag">Step 06 of 14</div>
+          <h3>Name Each LED Surface</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          As surfaces accumulate in a project, clear and descriptive naming becomes critical
+          for maintaining clarity in the layers panel and in the exported output. Each surface
+          can be given a name that directly communicates its physical role in the installation, such as "Main Screen," "Stage Left Wing," "Floor Riser 1," or "Ceiling Truss."
+        </p>
+        <div class="gif-wrap">
+          <img src="6.gif" alt="Step 6, Naming LED surfaces" loading="lazy" />
+          <div class="gif-bar">Assigning descriptive names to each surface in the layers panel</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Surface names are carried through to export filenames and patch data labels.
+          Clear naming prevents confusion during installation and eliminates the need
+          to trace surface identities from generic default names.
+        </div>
+      </div>
+    </div>
+
+    <!-- S7 -->
+    <div class="step-block" id="s7">
+      <div class="step-head">
+        <div class="step-num">7</div>
+        <div class="step-info">
+          <div class="step-tag">Step 07 of 14</div>
+          <h3>Use the One-Click Color Shifter</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          When multiple surfaces are placed close together on the canvas, distinguishing them
+          visually becomes important for accurate editing. The One-Click Color Shifter instantly
+          assigns a visually distinct color to each surface, cycling through a curated palette
+          that avoids applying similar hues to adjacent surfaces.
+        </p>
+        <div class="gif-wrap">
+          <img src="7.gif" alt="Step 7, Using the One-Click Color Shifter" loading="lazy" />
+          <div class="gif-bar">One-Click Color Shifter, automatic color differentiation across all surfaces</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Strong visual differentiation makes it immediately clear where one surface ends
+          and another begins. It reduces the risk of accidentally selecting and editing the
+          wrong surface and makes the canvas much faster to navigate visually.
+        </div>
+      </div>
+    </div>
+
+    <!-- S8 -->
+    <div class="step-block" id="s8">
+      <div class="step-head">
+        <div class="step-num">8</div>
+        <div class="step-info">
+          <div class="step-tag">Step 08 of 14</div>
+          <h3>Edit Panel Grids</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          Real LED installations rarely occupy a perfect rectangular grid. Structural elements,
+          rigging hardware, and installation constraints frequently require individual panels
+          to be omitted. Panel grid editing allows users to remove specific cells from a
+          surface grid, accurately representing physical gaps in an otherwise regular array.
+        </p>
+        <div class="gif-wrap">
+          <img src="8.gif" alt="Step 8, Editing the LED panel grid" loading="lazy" />
+          <div class="gif-bar">Removing individual panel cells within a surface grid</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Panels removed from the grid are excluded from pixel indexing. The exported mapping
+          data will precisely reflect the actual LED hardware layout, not an idealized rectangle, ensuring accurate signal assignment during production.
+        </div>
+      </div>
+    </div>
+
+    <!-- S9 -->
+    <div class="step-block" id="s9">
+      <div class="step-head">
+        <div class="step-num">9</div>
+        <div class="step-info">
+          <div class="step-tag">Step 09 of 14</div>
+          <h3>Customize Surface Labels</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          Surface labels are the text identifiers displayed on each surface in the canvas view.
+          Label color and size can be adjusted independently per surface, ensuring labels remain
+          readable against the surface fill color and that important surfaces are labeled
+          more prominently than smaller adjacent ones.
+        </p>
+        <div class="gif-wrap">
+          <img src="10.gif" alt="Step 9, Customizing surface labels" loading="lazy" />
+          <div class="gif-bar">Adjusting label color and font size for improved canvas clarity</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Well-configured labels make the finished canvas layout function as a clear reference
+          document. When the canvas is exported as a visual overview or printed for on-site
+          use, readable surface labels remove all ambiguity about zone identification.
+        </div>
+      </div>
+    </div>
+
+    <!-- S10 -->
+    <div class="step-block" id="s10">
+      <div class="step-head">
+        <div class="step-num">10</div>
+        <div class="step-info">
+          <div class="step-tag">Step 10 of 14</div>
+          <h3>Fit Canvas to Content</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          As surfaces are added and repositioned, the canvas viewport can drift away from the
+          content area. Fit Canvas to Content solves this with a single click, the viewport
+          is automatically adjusted to frame all placed surfaces and objects within the
+          visible window at an appropriate zoom level.
+        </p>
+        <div class="gif-wrap">
+          <img src="15.gif" alt="Step 10, Fit Canvas to Content" loading="lazy" />
+          <div class="gif-bar">Fit Canvas to Content, auto-adjusting the viewport to frame all project objects</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Running Fit Canvas to Content before export confirms that all surfaces are visible and
+          correctly positioned within the canvas. Surfaces that have drifted off-screen will be
+          revealed, preventing them from being missed during final verification.
+        </div>
+      </div>
+    </div>
+
+    <!-- S11 -->
+    <div class="step-block" id="s11">
+      <div class="step-head">
+        <div class="step-num">11</div>
+        <div class="step-info">
+          <div class="step-tag">Step 11 of 14</div>
+          <h3>Apply Basic Shape Masks</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          Built-in geometric mask shapes can be applied directly on top of LED surfaces
+          to define non-rectangular active display areas. The shape library includes
+          rectangles, circles, triangles, and hexagons, covering the most common
+          non-standard LED display forms in live production and event environments.
+        </p>
+        <div class="gif-wrap">
+          <img src="11.gif" alt="Step 11, Applying basic shape masks" loading="lazy" />
+          <div class="gif-bar">Applying a geometric mask to define a non-rectangular active display region</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Once a mask is placed, only pixels within the mask boundary are included in the export.
+          This allows a standard rectangular panel array to function as a circular, triangular,
+          or hexagonal display, matching the physical form of the installation.
+        </div>
+      </div>
+    </div>
+
+    <!-- S12 -->
+    <div class="step-block" id="s12">
+      <div class="step-head">
+        <div class="step-num">12</div>
+        <div class="step-info">
+          <div class="step-tag">Step 12 of 14</div>
+          <h3>Create Custom Shape Masks</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          For LED configurations that do not match any preset geometric shape, the custom
+          polygon tool allows users to draw any closed shape directly on the canvas.
+          Anchor points are placed by clicking, and the shape is completed by connecting
+          back to the first point. The resulting polygon is applied as a precision mask.
+        </p>
+        <div class="gif-wrap">
+          <img src="12.gif" alt="Step 12, Drawing a custom polygon mask" loading="lazy" />
+          <div class="gif-bar">Custom polygon tool, drawing a freeform closed mask shape</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          Custom polygon masks handle asymmetric configurations that no standard shape can
+          replicate, such as panels arranged around an architectural feature, or an LED
+          installation shaped to match a specific stage prop or scenic element.
+        </div>
+      </div>
+    </div>
+
+    <!-- S13 -->
+    <div class="step-block" id="s13">
+      <div class="step-head">
+        <div class="step-num">13</div>
+        <div class="step-info">
+          <div class="step-tag">Step 13 of 14</div>
+          <h3>Import a PNG Mask</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          When a mask shape has been prepared externally, as part of a brand identity package,
+          stage design asset, or graphic cutout, it can be imported directly as a PNG file.
+          PIX MAP reads the alpha channel of the imported PNG to define the mask boundary,
+          enabling highly complex shapes to be used without manual polygon drawing.
+        </p>
+        <div class="gif-wrap">
+          <img src="13.gif" alt="Step 13, Importing a PNG mask" loading="lazy" />
+          <div class="gif-bar">PNG mask import, using the alpha channel to define the active mask boundary</div>
+        </div>
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          PNG mask import is especially valuable when working with brand logos, sponsor graphics,
+          or custom fabricated LED forms where the shape originates from a graphic design
+          workflow. It bridges design and production planning in a single step.
+        </div>
+      </div>
+    </div>
+
+    <!-- S14 -->
+    <div class="step-block" id="s14">
+      <div class="step-head">
+        <div class="step-num">14</div>
+        <div class="step-info">
+          <div class="step-tag">Step 14 of 14</div>
+          <h3>Export the Layout</h3>
+        </div>
+      </div>
+      <div class="step-body">
+        <p>
+          When the layout is complete and all surfaces, masks, and configurations have been
+          verified, the project is ready for export. PIX MAP supports three export modes
+          that can be selected and downloaded simultaneously, giving technicians all
+          required production files in a single operation.
+        </p>
+        <div class="gif-wrap">
+          <img src="14.gif" alt="Step 14, Exporting the layout" loading="lazy" />
+          <div class="gif-bar">Export panel, selecting export modes and generating production output files</div>
+        </div>
+
+        <table class="export-table">
+          <thead>
+            <tr><th style="width:160px;">Export Mode</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Mask Only</code></td>
+              <td>Exports the mask boundary geometry for each surface, defining the active pixel region without patch assignment. Use when mask data is required independently of patch information.</td>
+            </tr>
+            <tr>
+              <td><code>Patch Only</code></td>
+              <td>Exports the pixel patch data, the mapping of output pixels to physical LED locations and signal assignments. Use when mask data already exists and only patch information is needed.</td>
+            </tr>
+            <tr>
+              <td><code>Mask with Patch</code></td>
+              <td>A combined export containing both the mask boundary and the complete pixel patch data. This is the primary deliverable for most production workflows and the most complete format available.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="step-why">
+          <strong>Why This Step Matters</strong>
+          All three export modes can be selected and downloaded in a single operation.
+          Generating all available outputs at once ensures the project does not need to be
+          reopened if a different format is requested at a later stage in the production workflow.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /workflow-steps -->
+
+  <!-- ────────────────────────────────────────────
+       BEST PRACTICES
+       ──────────────────────────────────────────── -->
+  <section id="best-practices" class="section">
+    <div class="eyebrow">05 · Reference</div>
+    <h2>Best Practices</h2>
+    <p>
+      The following recommendations reflect production-tested habits that improve accuracy,
+      reduce rework, and produce reliable output files across a wide range of LED installations.
+    </p>
+
+    <ul class="bp-list">
+      <li>
+        <span class="bp-icon">🏷</span>
+        <div class="bp-text">
+          <strong>Name every surface with a clear, descriptive label</strong>
+          <span>Use names that communicate the physical role of the surface,"Main Screen," "Stage Left Wing," "Floor Riser 1." Generic names like "Surface 3" cause confusion during installation and when reviewing exported files with crew members.</span>
+        </div>
+      </li>
+      <li>
+        <span class="bp-icon">📁</span>
+        <div class="bp-text">
+          <strong>Group related surfaces into named layer groups</strong>
+          <span>On installations with many surfaces, organize related zones into groups in the layers panel. Grouping all floor tiles, all wing panels, or all truss rigs together significantly speeds up navigation and reduces accidental edits.</span>
+        </div>
+      </li>
+      <li>
+        <span class="bp-icon">✅</span>
+        <div class="bp-text">
+          <strong>Verify all panel configurations before exporting</strong>
+          <span>Before generating export files, review each surface in the layers panel and confirm that panel counts, pixel dimensions, and pitch values match the hardware specification. Errors at this level produce incorrect patch data that only becomes apparent during installation.</span>
+        </div>
+      </li>
+      <li>
+        <span class="bp-icon">🖼</span>
+        <div class="bp-text">
+          <strong>Run Fit Canvas to Content before every export</strong>
+          <span>Use this tool immediately before exporting. It confirms that all surfaces are within the visible canvas viewport and that nothing has accidentally drifted off-screen. This is a fast, reliable final check before committing to an export.</span>
+        </div>
+      </li>
+      <li>
+        <span class="bp-icon">🎨</span>
+        <div class="bp-text">
+          <strong>Apply distinct color coding to all surfaces</strong>
+          <span>Use the One-Click Color Shifter or manually assign distinct colors so that no two adjacent surfaces share a similar hue. Strong visual differentiation makes the canvas easier to read, faster to navigate, and clearer when used as a printed on-site reference.</span>
+        </div>
+      </li>
+      <li>
+        <span class="bp-icon">📐</span>
+        <div class="bp-text">
+          <strong>Use reference imagery to guide surface placement</strong>
+          <span>When designing for a specific venue or stage, import a floor plan, logo, or architectural schematic as a canvas guide layer. Aligning surfaces to a real reference removes spatial guesswork and ensures the digital layout accurately reflects the physical space.</span>
+        </div>
+      </li>
+      <li>
+        <span class="bp-icon">💾</span>
+        <div class="bp-text">
+          <strong>Download all export formats in a single operation</strong>
+          <span>Select Mask Only, Patch Only, and Mask with Patch simultaneously and export them all at once. Having every format available prevents the need to reopen and re-export the project if a different output type is requested later in the production process.</span>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ────────────────────────────────────────────
+       FOOTER
+       ──────────────────────────────────────────── -->
+  <footer class="doc-footer">
+    <div class="brand"><span>PIX</span> MAP User Manual, 2026</div>
+    <div class="meta">LED Pixel Mapping · End-User Documentation</div>
+  </footer>
+
+</div><!-- /page -->
+
+<!-- ══════════════════════════════════════════════
+     ACTIVE NAV ON SCROLL
+     ══════════════════════════════════════════════ -->
+<script>
+(function () {
+  const items = document.querySelectorAll('#nav .nav-item');
+  const targets = [];
+
+  items.forEach(item => {
+    const id = item.getAttribute('href');
+    if (id && id.startsWith('#')) {
+      const el = document.querySelector(id);
+      if (el) targets.push({ el, item });
+    }
+  });
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        items.forEach(i => i.classList.remove('active'));
+        const match = targets.find(t => t.el === e.target);
+        if (match) match.item.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+
+  targets.forEach(t => obs.observe(t.el));
+})();
+</script>
+
+<!-- Return to the homepage exactly where the visitor left off.
+     Same logic as the pricing / login pages: history.back() restores the
+     home page from the browser's back-forward cache (preserving scroll
+     position + scene state, no reload / intro replay). Falls back to a
+     normal navigation if the manual was opened directly. -->
+<script>
+(function () {
+  function goHome(e) {
+    if (e) e.preventDefault();
+    var fallback = setTimeout(function () {
+      window.location.href = '../../index.html';
+    }, 150);
+    window.addEventListener('pagehide', function () { clearTimeout(fallback); }, { once: true });
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      clearTimeout(fallback);
+      window.location.href = '../../index.html';
+    }
+  }
+  document.querySelectorAll('a.logo, a.back-to-site').forEach(function (a) {
+    a.addEventListener('click', goHome);
+  });
+})();
+</script>
+
+</body>
+</html>
