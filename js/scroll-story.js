@@ -43,6 +43,21 @@
   /* ---- sem1 ready: scrollY recorded once sem1 is fully formed ---- */
   var _sem1ReadyRecorded = false;
 
+  window.PIXMAP = window.PIXMAP || {};
+  window.PIXMAP.getPhase4StartP = function () { return _phase4StartP; };
+
+  if (sessionStorage.getItem('comingFromSubpage') === 'true') {
+    var savedStartP = sessionStorage.getItem('phase4StartP');
+    if (savedStartP !== null) {
+      _phase4StartP = parseFloat(savedStartP);
+    }
+    var savedAnchor = sessionStorage.getItem('sem1ReadyScrollY');
+    if (savedAnchor !== null) {
+      window.PIXMAP.sem1ReadyScrollY = parseInt(savedAnchor, 10);
+      _sem1ReadyRecorded = true;
+    }
+  }
+
   /* ---- Scroll velocity tracking (px per rAF tick) ---- */
   var _lastScrollY = 0;
   var _scrollVel   = 0;
@@ -54,6 +69,7 @@
     /* Measure how many px scrolled since last tick — used for snap decisions */
     _scrollVel   = Math.abs(window.scrollY - _lastScrollY);
     _lastScrollY = window.scrollY;
+
 
     var isMobile = window.innerWidth <= 820;
     const range  = hero.offsetHeight - window.innerHeight;
@@ -82,9 +98,9 @@
       var moveT = easeInOut(clamp(p / 0.18, 0, 1));
 
       if (isMobile) {
-        var mMoveUp = (moveT * 50).toFixed(1);
-        if (heroCopyL) heroCopyL.style.transform = 'translateY(-' + mMoveUp + 'px)';
-        if (heroCopyR) heroCopyR.style.transform = 'translateY('  + mMoveUp + 'px)';
+        /* Keep taglines completely fixed in position relative to the logo, preventing scroll drift */
+        if (heroCopyL) heroCopyL.style.transform = 'translateY(-100%)';
+        if (heroCopyR) heroCopyR.style.transform = 'translateY(0px)';
       } else {
         var moveUp = (moveT * 220 * (window.innerHeight / 1080)).toFixed(1);
         var copyTx = 'translateY(calc(-50% - ' + moveUp + 'px))';
@@ -162,8 +178,13 @@
        Anchors to the scroll position at that instant so the very next scroll
        drives the shrink/crossfade — no dead zone after formation. */
     var patchNowReady = !!(window.PIXMAP && window.PIXMAP.patchReady);
-    if (patchNowReady && !_prevPatchReady) _phase4StartP = p;
-    if (!patchNowReady)                    _phase4StartP = null;
+    var returning = sessionStorage.getItem('comingFromSubpage') === 'true';
+    if (patchNowReady && !_prevPatchReady && _phase4StartP === null) {
+      _phase4StartP = p;
+    }
+    if (!patchNowReady && !returning) {
+      _phase4StartP = null;
+    }
     _prevPatchReady = patchNowReady;
 
     var phase4T = 0;

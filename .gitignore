@@ -15,3 +15,6 @@ assets/_t/
 
 # Dependencies (if ever added)
 node_modules/
+
+# Archive folder
+_archive/

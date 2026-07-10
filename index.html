@@ -15,14 +15,14 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/preloader.css">
-  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/header.css?v=20260709-byline">
   <link rel="stylesheet" href="css/hero.css">
   <link rel="stylesheet" href="css/footer.css">
-  <link rel="stylesheet" href="css/sections.css">
-  <link rel="stylesheet" href="css/final-cta-instant.css">
-  <link rel="stylesheet" href="css/usp.css?v=20260625c">
+  <link rel="stylesheet" href="css/sections.css?v=20260710-sem1size3">
+  <link rel="stylesheet" href="css/final-cta-instant.css?v=20260629">
+  <link rel="stylesheet" href="css/usp.css?v=20260710-smaller5">
   <!-- Responsive hardening — must load LAST so it wins the cascade -->
-  <link rel="stylesheet" href="css/responsive.css?v=20260626">
+  <link rel="stylesheet" href="css/responsive.css?v=20260710-panels">
 </head>
 <body class="loading">
 
@@ -51,7 +51,7 @@
     <span class="hdr-edge" aria-hidden="true"></span>
 
     <div class="brand">
-      <a class="brand-logo" href="index.html">
+      <a class="brand-logo" href="./">
         <img src="assets/logos/logo_black.png" alt="Pix-Map logo">
       </a>
       <a class="brand-vj" href="pages/vjkaycee.html">
@@ -132,7 +132,7 @@
       <div id="op1TileGrid"></div>
       <div id="op1Seamless"><img src="assets/images/op1.png" alt=""></div>
     </div>
-    <p id="op1Text" aria-hidden="true">But PIXMAP doesn't stop at patch creation, it also unlocks advanced output generation for professional LED workflows.</p>
+    <p id="op1Text" aria-hidden="true">Patch creation is just the beginning, PIXMAP also unlocks advanced output generation for professional LED workflows.</p>
 
     <!-- USP parallax showcase — 10 product features, one per scroll viewport -->
     <section id="uspSection" aria-label="Product Features">
@@ -152,7 +152,7 @@
 
   <!-- Final CTA — appears instantly after op2 image exits, controlled by op1-scene.js -->
   <section id="finalCta">
-    <p>PIXMAP is a professional LED workflow platform built for<br class="cta-br"> creating precise pixel patches, generating advanced production outputs,<br class="cta-br"> and managing intelligent LED wiring connections within one unified system.</p>
+    <p>PIXMAP is a professional LED workflow platform built for creating precise pixel patches,<br class="cta-br"> generating advanced production outputs within one unified system.</p>
     <a id="finalCtaBtn" href="pages/download.html">Download Now</a>
   </section>
 
@@ -208,7 +208,12 @@
       if (returning) {
         // Inject styles immediately to hide preloader and set dark theme so it never flashes during parse
         var style = document.createElement('style');
-        style.innerHTML = '#preloader { display: none !important; } body { background: #04040E !important; } #bgField { opacity: 1 !important; } #finalCta, .site-footer { opacity: 1 !important; transform: none !important; transition: none !important; }';
+        var savedScrollY = parseInt(sessionStorage.getItem('homeScrollY') || '0', 10);
+        var css = '#preloader { display: none !important; } body { background: #04040E !important; } #bgField { opacity: 1 !important; }';
+        if (savedScrollY > window.innerHeight * 3.5) {
+          css += ' #finalCta, .site-footer { opacity: 1 !important; transform: none !important; transition: none !important; }';
+        }
+        style.innerHTML = css;
         document.head.appendChild(style);
       } else {
         window.scrollTo(0, 0);
@@ -260,6 +265,15 @@
         link.addEventListener('click', function () {
           sessionStorage.setItem('homeScrollY', window.scrollY);
           sessionStorage.setItem('comingFromSubpage', 'true');
+          if (window.PIXMAP) {
+            if (window.PIXMAP.getPhase4StartP) {
+              var p4 = window.PIXMAP.getPhase4StartP();
+              if (p4 !== null) sessionStorage.setItem('phase4StartP', p4);
+            }
+            if (window.PIXMAP.sem1ReadyScrollY !== null && window.PIXMAP.sem1ReadyScrollY !== undefined) {
+              sessionStorage.setItem('sem1ReadyScrollY', window.PIXMAP.sem1ReadyScrollY);
+            }
+          }
         });
       });
       // Clicking header/footer logo clears scroll position so page starts fresh
@@ -267,6 +281,8 @@
         logo.addEventListener('click', function () {
           sessionStorage.removeItem('comingFromSubpage');
           sessionStorage.removeItem('homeScrollY');
+          sessionStorage.removeItem('phase4StartP');
+          sessionStorage.removeItem('sem1ReadyScrollY');
         });
       });
     });
@@ -274,12 +290,12 @@
 
   <!-- Scripts — order matters -->
   <script src="js/grid-trail.js"></script>
-  <script src="js/preloader.js"></script>
-  <script src="js/scroll-story.js"></script>
+  <script src="js/preloader.js?v=20260710-taglines5"></script>
+  <script src="js/scroll-story.js?v=20260710-hero5"></script>
   <script src="js/patch-scene.js"></script>
-  <script src="js/usp-scene.js?v=20260625c"></script>
-  <script src="js/op1-scene.js"></script>
-  <script src="js/final-cta-stabilizer.js"></script>
+  <script src="js/usp-scene.js?v=20260710-smaller2"></script>
+  <script src="js/op1-scene.js?v=20260710-panels2"></script>
+  <script src="js/final-cta-stabilizer.js?v=20260629"></script>
 
   <!-- Restore scroll position after all scenes are built -->
   <script>
@@ -289,11 +305,16 @@
         if (savedScrollY !== null) {
           setTimeout(function () {
             window.scrollTo(0, parseInt(savedScrollY, 10));
-          }, 80);
+            sessionStorage.removeItem('comingFromSubpage');
+            sessionStorage.removeItem('phase4StartP');
+            sessionStorage.removeItem('sem1ReadyScrollY');
+            sessionStorage.removeItem('homeScrollY');
+          }, 100);
+        } else {
+          sessionStorage.removeItem('comingFromSubpage');
+          sessionStorage.removeItem('phase4StartP');
+          sessionStorage.removeItem('sem1ReadyScrollY');
         }
-        /* Always clear once consumed — otherwise a missing homeScrollY would
-           leave the flag set and permanently skip the intro on next load. */
-        sessionStorage.removeItem('comingFromSubpage');
       }
     })();
   </script>

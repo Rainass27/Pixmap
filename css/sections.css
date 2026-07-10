@@ -12,7 +12,7 @@
   left: 50%;
   top: calc(50% + var(--header-h) / 2);
   transform: translateX(-50%) translateY(-50%);
-  width: clamp(560px, 90vw, 1360px);  /* near full width with breathing room */
+  width: clamp(450px, 72vw, 1120px);  /* near full width with breathing room */
   z-index: 485;
   opacity: 0;
   visibility: hidden;
@@ -513,19 +513,31 @@
   65%       { transform: translateY(-12px) rotate(0.20deg); }
 }
 
+/* 3 panels left, 3 right (positioned by layoutGroup in JS). No float —
+   each panel simply slides up + fades in when it is revealed, one-by-one
+   as you scroll. Once revealed they stay put (no idle motion). */
 .op1-panel {
   position: absolute;
   width: clamp(190px, 17vw, 260px);
   pointer-events: none;
   opacity: 0;
+  /* Flat — no tilt. Only the slide-up + fade plays on reveal. */
+  transform: translateY(24px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 
-.op1-panel.visible { opacity: 1; }
+.op1-panel.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 .op1-panel-inner {
   width: 100%;
-  padding: 16px 18px 18px;
+  padding: 14px 16px 15px;
+  text-align: center;          /* content centred within the card */
 
   /* True glassmorphism */
   background: linear-gradient(
@@ -537,19 +549,15 @@
   backdrop-filter: blur(22px) saturate(160%);
   -webkit-backdrop-filter: blur(22px) saturate(160%);
 
-  /* Crisp glass border */
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-top: 1px solid rgba(255, 255, 255, 0.28);
-  border-left: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
+  /* Flat, sharp edges — uniform thin border, square corners, no bevel. */
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0;
 
-  /* Layered shadows for depth */
+  /* Drop shadow only (no inset highlight bevel) */
   box-shadow:
     0 2px  4px  rgba(0, 0, 0, 0.20),
     0 8px  24px rgba(0, 0, 0, 0.45),
-    0 20px 48px rgba(0, 0, 0, 0.30),
-    inset 0  1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+    0 20px 48px rgba(0, 0, 0, 0.30);
 
   will-change: transform;
 }
@@ -578,10 +586,20 @@
   font-family: 'Open Sans', sans-serif;
   font-weight: 300;
   font-size: clamp(0.60rem, 0.78vw, 0.70rem);
-  line-height: 1.78;
+  line-height: 1.5;
   color: rgba(255, 255, 255, 0.88);
   margin: 0;
   text-shadow: 0 1px 4px rgba(0, 10, 40, 0.60);
+
+  /* Justified body, centred last line, and capped at exactly 3 lines so
+     every card has a clean, equal block of text. */
+  text-align: justify;
+  text-align-last: center;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
 }
 
 /* ============================================================
@@ -594,6 +612,10 @@
   align-items: center;
   justify-content: center;
   gap: 32px;
+  /* Tall enough that the finale + footer fill the viewport, so it reveals
+     from the top with no empty gap and the handoff never has to clamp the
+     scroll (which caused the jump). */
+  min-height: 82vh;
   padding: 64px clamp(24px, 6vw, 80px) 120px;
   position: relative;
   z-index: 10;
@@ -605,15 +627,14 @@
 #finalCta.revealed { opacity: 1; }
 
 #finalCta p {
-  max-width: min(1000px, 90vw); /* spread container slightly more so justified words fill more horizontal space */
+  max-width: min(1150px, 95vw); /* widened so the 2-line CTA sentence fits without an extra wrap, while still filling out for justification */
   width: 100%;
   font-family: 'Open Sans', sans-serif;
   font-weight: 300;
   font-size: clamp(1.2rem, 2.0vw, 1.7rem);
   line-height: 1.9;
   letter-spacing: 0.02em;
-  text-align: justify; /* justify the block of text */
-  text-align-last: justify; /* strictly justify even the last line of text */
+  text-align: center;
   color: rgba(225, 240, 255, 0.96);
   margin: 0;
 }

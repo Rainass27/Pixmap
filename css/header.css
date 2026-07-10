@@ -345,7 +345,20 @@
 /* ---- Responsive ---- */
 @media (max-width: 760px) {
   .site-header  { padding: 0 20px; }
-  .brand .byline { display: none; }
+  .brand .byline {
+    display: flex !important;
+  }
+  .brand .byline .by {
+    font-size: 8px !important;
+    line-height: 10px !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 1px !important;
+  }
+  .brand .byline .name {
+    font-size: 13px !important;
+    line-height: 14px !important;
+    letter-spacing: 1px !important;
+  }
   .brand img    { height: 36px; }
 
   /* Hide nav by default; shown as dropdown when .open */

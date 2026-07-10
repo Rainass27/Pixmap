@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Pricing — PIXMAP</title>
   
   <!-- Google Fonts -->
@@ -13,7 +16,7 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="../css/variables.css">
   <link rel="stylesheet" href="../css/header.css">
-  <link rel="stylesheet" href="pricing.css">
+  <link rel="stylesheet" href="pricing.css?v=20260708">
   <link rel="stylesheet" href="../css/responsive.css?v=20260626">
 </head>
 <body class="bg-on">
@@ -28,7 +31,7 @@
     <span class="hdr-edge" aria-hidden="true"></span>
 
     <div class="brand">
-      <a class="brand-logo" href="../index.html">
+      <a class="brand-logo" href="../">
         <img src="../assets/logos/logo_black.png" alt="Pix-Map logo">
       </a>
       <a class="brand-vj" href="vjkaycee.html">
@@ -41,7 +44,7 @@
 
     <nav class="site-nav" id="siteNav">
       <a class="nav-link" href="download.html">Downloads</a>
-      <a class="nav-link" href="../index.html#manual">Manual</a>
+      <a class="nav-link" href="manual/index.html">Manual</a>
       <a class="nav-link" href="pricing.html">Pricing</a>
       <a class="btn-auth" href="login.html">Login / Sign Up</a>
     </nav>
@@ -77,53 +80,15 @@
         <h1 class="modal-title">Pricing</h1>
 
         <!-- Pricing Cards Grid -->
-        <div class="pricing-grid">
-          
-          <!-- 1. Starter Plan -->
-          <div class="pricing-card">
-            <div>
-              <h2 class="plan-name">Starter</h2>
-              <div class="price-box">
-                <span class="price-amount">Free</span>
-              </div>
-              <ul class="features-list">
-                <li class="feature-item">
-                  <span class="feature-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"></path></svg>
-                  </span>
-                  Up to 8 panels
-                </li>
-                <li class="feature-item">
-                  <span class="feature-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"></path></svg>
-                  </span>
-                  PNG export
-                </li>
-                <li class="feature-item">
-                  <span class="feature-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"></path></svg>
-                  </span>
-                  Community support
-                </li>
-                <li class="feature-item">
-                  <span class="feature-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"></path></svg>
-                  </span>
-                  Basic palette
-                </li>
-              </ul>
-            </div>
-            <button class="btn-pricing outline">Start Free</button>
-          </div>
+        <div class="pricing-grid single-plan">
 
-          <!-- 2. Studio Plan (Popular) -->
+          <!-- Single Yearly Plan -->
           <div class="pricing-card popular">
-            <div class="popular-badge">Most Popular</div>
             <div>
               <h2 class="plan-name">Studio</h2>
               <div class="price-box">
-                <span class="price-amount">$24</span>
-                <span class="price-period">/ month</span>
+                <span class="price-amount">₹6,000</span>
+                <span class="price-period">/ year</span>
               </div>
               <ul class="features-list">
                 <li class="feature-item">
@@ -148,54 +113,17 @@
                   <span class="feature-icon">
                     <svg viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"></path></svg>
                   </span>
-                  Cloud registry
+                  Advanced Output
                 </li>
                 <li class="feature-item">
                   <span class="feature-icon">
                     <svg viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"></path></svg>
                   </span>
-                  Priority support
+                  Custom logo
                 </li>
               </ul>
             </div>
-            <button class="btn-pricing primary">Buy Studio</button>
-          </div>
-
-          <!-- 3. Enterprise Plan -->
-          <div class="pricing-card">
-            <div>
-              <h2 class="plan-name">Enterprise</h2>
-              <div class="price-box">
-                <span class="price-amount">Custom</span>
-              </div>
-              <ul class="features-list">
-                <li class="feature-item">
-                  <span class="feature-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"></path></svg>
-                  </span>
-                  Multi-seat licenses
-                </li>
-                <li class="feature-item">
-                  <span class="feature-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"></path></svg>
-                  </span>
-                  Brand logo embedding
-                </li>
-                <li class="feature-item">
-                  <span class="feature-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"></path></svg>
-                  </span>
-                  On-site training
-                </li>
-                <li class="feature-item">
-                  <span class="feature-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"></path></svg>
-                  </span>
-                  SLA & onboarding
-                </li>
-              </ul>
-            </div>
-            <button class="btn-pricing outline">Contact Sales</button>
+            <button class="btn-pricing primary">Get Started</button>
           </div>
 
         </div>
@@ -227,7 +155,7 @@
         
         setTimeout(() => {
           var fallback = setTimeout(() => {
-            window.location.href = '../index.html';
+            window.location.href = '../';
           }, 150);
           window.history.back();
         }, 400);

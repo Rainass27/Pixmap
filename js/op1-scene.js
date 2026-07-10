@@ -1,14 +1,15 @@
 /* ============================================================
-   OP1 SCENE — full narrative sequence
+   OP1 SCENE — narrative sequence
 
-   Flow preserved:
+   Flow:
      sem1+patch fade → sentence A → op1 tile assembly → op1 panels
-     → op1/op2 flip → wiring sentence → op2 panels → final CTA → footer
+     → op1 card rises/fades out → final CTA → footer
 
    Final handoff:
-     OP2 floats first, then OP2 image + panels scroll upward, then the
-     final CTA is revealed. On reverse scroll, the CTA hides and OP2
-     returns naturally with its six floating elements. No forced scroll jump.
+     Once the op1 panels have revealed, held, and slid away, the op1
+     card itself rises and fades, then the final CTA + footer are
+     revealed. On reverse scroll, the CTA hides and op1 returns
+     naturally with its six panels. No forced scroll jump.
    ============================================================ */
 
 (function () {
@@ -67,29 +68,7 @@
     }
   }
 
-  /* ── Flip wrapper: front = op1, back = op2 ────────────────── */
-  var op1FlipWrap = document.createElement('div');
-  op1FlipWrap.id = 'op1FlipWrap';
-
-  var op1Front = document.createElement('div');
-  op1Front.className = 'op1-face op1-front';
-  op1Front.appendChild(op1Grid);
-  op1Front.appendChild(op1Img);
-
-  var op1Back = document.createElement('div');
-  op1Back.className = 'op1-face op1-back';
-  var op2El = document.createElement('img');
-  op2El.src = 'assets/images/op2.png';
-  op2El.alt = '';
-  op1Back.appendChild(op2El);
-
-  op1FlipWrap.appendChild(op1Front);
-  op1FlipWrap.appendChild(op1Back);
-  op1Scene.appendChild(op1FlipWrap);
-
   /* ── Glass panel group factory ────────────────────────────── */
-  var PANEL_ROW_TOPS = [0.14, 0.42, 0.70];
-
   function createGroup(data) {
     var wrap = document.createElement('div');
     wrap.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:495;visibility:hidden;';
@@ -97,10 +76,11 @@
     var panels = [];
     data.forEach(function (p, i) {
       var el = document.createElement('div');
-      el.className = 'op1-panel';
+      /* Left 3 tilt one way, right 3 the opposite — a "wings" splay. */
+      el.className = 'op1-panel ' + (i < 3 ? 'op1-tilt-l' : 'op1-tilt-r');
 
       var inner = document.createElement('div');
-      inner.className = 'op1-panel-inner op1-float-' + i;
+      inner.className = 'op1-panel-inner';
       inner.innerHTML =
         '<p class="op1-panel-title">' + p.title + '</p>' +
         '<p class="op1-panel-desc">'  + p.desc  + '</p>';
@@ -112,97 +92,91 @@
     return { wrap: wrap, panels: panels };
   }
 
+  /* 3 panels on the left, 3 on the right — anchored to the centred image's
+     edges so they sit "stuck" to it (tucked slightly onto the image), three
+     rows spanning the image height. Mirrors the #op1Scene CSS width formula
+     so it stays in sync without needing a live measurement. */
   function layoutGroup(g) {
-    var vh = window.innerHeight, edge = 'clamp(28px,3vw,52px)', w = 'clamp(190px,17vw,260px)';
-    g.panels.forEach(function (el, i) {
-      var isLeft = i < 3, ri = isLeft ? i : i - 3;
-      el.style.top = px(vh * PANEL_ROW_TOPS[ri]);
-      el.style.width = w;
-      el.style.bottom = 'auto';
-      if (isLeft) { el.style.left = edge; el.style.right = 'auto'; }
-      else { el.style.right = edge; el.style.left = 'auto'; }
-    });
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var headerH = getHeaderHeight();
+
+    var capW    = Math.max(480, Math.min(0.78 * vw, 1160));   /* clamp(480,78vw,1160) */
+    var heightW = (vh - headerH - 120) * (16 / 9);
+    var imgW    = Math.min(capW, heightW);
+    var imgH    = imgW * 9 / 16;
+    var imgLeft  = (vw - imgW) / 2;
+    var imgRight = (vw + imgW) / 2;
+    var imgTop   = (vh / 2 + headerH / 2) - imgH / 2;
+
+    var isMobile = vw <= 820;
+
+    if (isMobile) {
+      /* Mobile layout: 3 above the image, 3 below the image.
+         Spread them horizontally. */
+      var pw    = Math.floor((vw - 20) / 3);
+      var space = (vw - 3 * pw) / 4;
+
+      g.panels.forEach(function (el, i) {
+        var isTop = i < 3;
+        var col   = isTop ? i : i - 3;
+        var L     = space + col * (pw + space);
+
+        el.style.width  = pw + 'px';
+        el.style.left   = px(L);
+        el.style.right  = 'auto';
+
+        if (isTop) {
+          el.style.top    = 'auto';
+          el.style.bottom = px(vh - imgTop + 10);
+        } else {
+          el.style.bottom = 'auto';
+          el.style.top    = px(imgTop + imgH + 10);
+        }
+      });
+    } else {
+      /* Original desktop layout */
+      var pw      = Math.round(Math.max(190, Math.min(vw * 0.17, 264)));  /* panel width */
+      var overlap = 26;                 /* how far each panel tucks onto the image */
+      var rowTop  = [0.10, 0.40, 0.70]; /* row positions, relative to image height */
+
+      g.panels.forEach(function (el, i) {
+        var isLeft = i < 3, ri = isLeft ? i : i - 3;
+        el.style.width  = pw + 'px';
+        el.style.right  = 'auto';
+        el.style.bottom = 'auto';
+        el.style.top    = px(imgTop + imgH * rowTop[ri]);
+
+        var L = isLeft ? (imgLeft - pw + overlap) : (imgRight - overlap);
+        L = Math.max(6, Math.min(L, vw - pw - 6));   /* keep fully on-screen */
+        el.style.left = px(L);
+      });
+    }
   }
 
   function hideGroup(g) {
-    g.panels.forEach(function (el) {
-      el.classList.remove('visible');
-      el.style.opacity = '';
-      el.style.transform = '';
-    });
+    g.panels.forEach(function (el) { el.classList.remove('visible'); });
     g.wrap.style.visibility = 'hidden';
+    g.wrap.style.opacity = '0';
+    g.wrap.style.transform = '';   /* clear any exit-up shift */
   }
 
   var OP1_PANELS = [
-    { title: 'Advanced Output Structuring',  desc: 'Organizes complex LED layouts into clean, output-ready sections.' },
-    { title: 'Precise Slice Management',     desc: 'Helps manage individual screen slices with accurate placement and alignment.' },
-    { title: 'Pixel-Perfect Output Control', desc: 'Maintains exact size, scale, and positioning across LED sections.' },
-    { title: 'Faster Output Preparation',    desc: 'Reduces manual time needed to arrange complex output layouts.' },
-    { title: 'Clean Section Organization',   desc: 'Keeps multiple LED parts, screens, and segments easy to identify and manage.' },
-    { title: 'Production-Ready Deployment',  desc: 'Prepares LED output structures for smoother real-world execution.' }
-  ];
-
-  var OP2_PANELS = [
-    { title: 'Automatic Wiring Generation',       desc: 'Automatically creates clean LED wiring paths, reducing manual connection effort and setup complexity.' },
-    { title: 'Port Capacity Calculation',         desc: 'Calculates how many panels or pixels each port can safely handle for better output planning.' },
-    { title: 'Bit Rate & Frame Rate Visibility',  desc: 'Allows teams to view technical output values like bit rate and frame rate for accurate performance monitoring.' },
-    { title: 'Custom Processor Selection',        desc: 'Lets users select the required LED processor based on the project\'s technical and production needs.' },
-    { title: 'Processor Load & Signal Stability', desc: 'Helps balance processor load, avoid overload, control signal loss, and maintain stable LED performance during deployment.' },
-    { title: 'Detailed PDF Documentation',        desc: 'Generates a complete wiring document with connection details, processor data, and output planning for on-site execution.' }
+    { title: 'Advanced Output Structuring',   desc: 'Organizes complex LED layouts into clean, structured, output-ready sections for final deployment.' },
+    { title: 'Precision Slice Management',     desc: 'Controls each LED slice with accurate positioning, alignment, scale, and resolution.' },
+    { title: 'Pixel-Perfect Output Control',  desc: 'Maintains exact pixel accuracy across all LED sections without distortion or misalignment.' },
+    { title: 'Faster Output Preparation',     desc: 'Streamlines the output setup process by reducing manual arrangement and correction time.' },
+    { title: 'Clean Section Organization',    desc: 'Groups screens, segments, and LED parts clearly for easier identification and management.' },
+    { title: 'Production-Ready Output Layout', desc: 'Prepares the complete LED output structure for smooth technical execution on-site.' }
   ];
 
   var op1Group = createGroup(OP1_PANELS);
-  var op2Group = createGroup(OP2_PANELS);
   layoutGroup(op1Group);
-  layoutGroup(op2Group);
   window.addEventListener('resize', function () {
     layoutGroup(op1Group);
-    layoutGroup(op2Group);
   });
 
-  /* ── Mouse parallax for floating panels ──────────────────── */
-  var prlxTargX = 0, prlxTargY = 0, prlxX = 0, prlxY = 0;
-  var PRLX_MAX = 14;
-
-  document.addEventListener('mousemove', function (e) {
-    prlxTargX = (e.clientX / window.innerWidth  - 0.5) * PRLX_MAX * 2;
-    prlxTargY = (e.clientY / window.innerHeight - 0.5) * PRLX_MAX * 2;
-  }, { passive: true });
-
-  (function prlxFrame() {
-    requestAnimationFrame(prlxFrame);
-    prlxX += (prlxTargX - prlxX) * 0.08;
-    prlxY += (prlxTargY - prlxY) * 0.08;
-    var tx = 'translate(' + prlxX.toFixed(2) + 'px,' + prlxY.toFixed(2) + 'px)';
-    if (op1Group.wrap.style.visibility === 'visible') op1Group.wrap.style.transform = tx;
-    if (op2Group.wrap.style.visibility === 'visible') op2Group.wrap.style.transform = tx;
-  }());
-
-  /* ── Overlay + sentences ─────────────────────────────────── */
-  var op1Overlay = document.createElement('div');
-  op1Overlay.id = 'op1Overlay';
-  document.body.appendChild(op1Overlay);
-
-  var op1SentB = document.createElement('p');
-  op1SentB.id = 'op1SentB';
-  op1SentB.textContent =
-    'And that’s not all, PIXMAP also brings intelligent LED wiring ' +
-    'and connection mapping into the workflow.';
-  document.body.appendChild(op1SentB);
-
-  function setOverlay(op) {
-    op1Overlay.style.visibility = op > 0.005 ? 'visible' : 'hidden';
-    op1Overlay.style.opacity = op.toFixed(3);
-  }
-
-  function setSentB(op) {
-    op1SentB.style.visibility = op > 0.005 ? 'visible' : 'hidden';
-    op1SentB.style.opacity = op.toFixed(3);
-  }
-
-  /* ── Word spans ───────────────────────────────────────────── */
+  /* ── Word spans (sentence A) ──────────────────────────────── */
   var wordSpans = [], textInited = false;
-  var wordSpansB = [], textBInited = false;
 
   function buildWordSpans(el, store) {
     var sentence = el.textContent.replace(/\s+/g, ' ').trim();
@@ -224,12 +198,6 @@
     if (textInited || !op1TextEl) return;
     textInited = true;
     buildWordSpans(op1TextEl, wordSpans);
-  }
-
-  function initTextB() {
-    if (textBInited || !op1SentB) return;
-    textBInited = true;
-    buildWordSpans(op1SentB, wordSpansB);
   }
 
   function showWords(el, spans, count) {
@@ -264,7 +232,29 @@
   function seqDoneAt()   { return op1StartAt() + TILE_TOTAL + 0.20; }
 
   var STATE = 'IDLE', savedAnchor = null, op1AsmScrollY = null, seqT0 = null;
-  var sentBStartT = null, sentBScrollY = null, postBAnchor = null;
+
+  /* Scroll runway reserved below the op1 assembly so the panel reveal +
+     exit sequence has room to play before the footer could be reached. */
+  var reservedHeightPx = null;
+  var NARRATIVE_RUNWAY = 3;            /* in viewport-heights */
+
+  /* Handoff state for the op1 → finale transition (mirrors the old op2
+     handoff logic, but with no flip / wiring stage in between). */
+  var exitFwdSaved = null;
+  var HANDOFF_HYST = 40;               /* px dead-band so the handoff doesn't thrash */
+
+  function revealFinale() {
+    if (window.PIXMAP && typeof window.PIXMAP.revealFinale === 'function') {
+      window.PIXMAP.revealFinale();
+    } else {
+      document.body.classList.add('story-final');
+    }
+  }
+
+  function hideFinale() {
+    document.body.classList.remove('story-final');
+    if (finalCta) finalCta.classList.remove('revealed');
+  }
 
   function setBaseHidden() {
     sem1Bg.style.opacity = '0';
@@ -276,69 +266,55 @@
   }
 
   function resetFinalLatch() {
-    if (window.PIXMAP) window.PIXMAP._postBExitDone = false;
+    if (window.PIXMAP) window.PIXMAP._op1ExitDone = false;
     /* Final CTA + footer stay revealed once they've faded in —
        the fade only plays on the very first entry. */
   }
 
-  function completePostBHandoff(exitFwd) {
-    if (window.PIXMAP && window.PIXMAP._postBExitDone) return;
+  function completeOp1Handoff(exitFwd) {
+    if (window.PIXMAP && window.PIXMAP._op1ExitDone) return;
 
     window.PIXMAP = window.PIXMAP || {};
-    window.PIXMAP._postBExitDone = true;
+    window.PIXMAP._op1ExitDone = true;
     window.PIXMAP.netActive = true;
+    exitFwdSaved = exitFwd;   /* remember where op1 left, for reversible scroll-up */
 
     op1Scene.style.opacity = '0';
     op1Scene.style.visibility = 'hidden';
     op1Scene.style.transform = '';
     op1Scene.classList.remove('glow-active');
     hideGroup(op1Group);
-    hideGroup(op2Group);
-    setOverlay(0);
-    setSentB(0);
     setBaseHidden();
 
     var uspSticky = document.getElementById('uspSticky');
     if (uspSticky) uspSticky.classList.remove('active');
 
-    if (uspSection && postBAnchor !== null) {
-      var handoffScrollY = postBAnchor + exitFwd;
-      var nextHeight = Math.max(0, handoffScrollY - uspSection.offsetTop + 4);
+    if (uspSection) {
+      /* Anchor the document end to whichever is lower: the ideal handoff
+         point, or wherever the scroll has actually reached. */
+      var asmAnchor = op1AsmScrollY || savedAnchor;
+      var handoffScrollY = Math.max(window.scrollY, asmAnchor + exitFwd);
+      var idealHeight = handoffScrollY - uspSection.offsetTop + 4;
+
+      /* Keep the document tall enough that the CURRENT scroll position is
+         still valid after the collapse — see original op2 handoff notes:
+         reserve at least a viewport's worth below this point so nothing
+         jumps if the finale is shorter than the viewport. */
+      var footerEl = document.querySelector('.site-footer');
+      var belowH = (finalCta ? finalCta.offsetHeight : 0) +
+                   (footerEl ? footerEl.offsetHeight : 0);
+      var noClampHeight = (window.scrollY + window.innerHeight) -
+                          uspSection.offsetTop - belowH;
+
+      var nextHeight = Math.max(0, idealHeight, noClampHeight);
       uspSection.style.height = px(nextHeight);
     }
 
-    /* Reveal of the final CTA + footer is handled by
-       js/final-cta-stabilizer.js (IntersectionObserver) so the fade
-       plays as each element scrolls into view rather than snapping. */
-  }
-
-  function renderOp2Stage(fwd2, vh2, p2Drift) {
-    var up = fwd2 > p2Drift ? (fwd2 - p2Drift) : 0;
-
-    op1Scene.style.visibility = 'visible';
-    op1Scene.style.opacity = '1';
-    op1Scene.style.transform = up > 0
-      ? 'translateX(-50%) translateY(calc(-50% - ' + px(up) + '))'
-      : '';
-    setTiles(TILE_TOTAL + 1);
-    if (op1Img) op1Img.style.opacity = '1';
-    setBaseHidden();
-    op1FlipWrap.style.transform = 'rotateX(180deg)';
-    op1Scene.classList.add('glow-active');
-
-    var op2DriftT = clamp(fwd2 / p2Drift, 0, 1);
-    var op2MoveY = -(op2DriftT * 32) - up;
-    op2Group.wrap.style.visibility = 'visible';
-    var op2Op = fwd2 < 120 ? clamp(fwd2 / 120, 0, 1) : (up > 0 ? clamp(1 - up / 150, 0, 1) : 1);
-    op2Group.panels.forEach(function (el) {
-      el.classList.add('visible');
-      el.style.opacity = op2Op.toFixed(3);
-      el.style.transform = 'translateY(' + px(op2MoveY) + ')';
-    });
-
-    hideGroup(op1Group);
-    setOverlay(0);
-    setSentB(0);
+    /* The op1 panel stage is fully done — now (and only now) reveal the
+       closing CTA + footer together. They were hard-hidden until this
+       moment, so they can never surface early no matter how fast the
+       user scrolled. */
+    revealFinale();
   }
 
   /* ── rAF loop ─────────────────────────────────────────────── */
@@ -385,58 +361,22 @@
         op1Scene.style.opacity = '1';
         op1Scene.style.visibility = 'visible';
         op1Scene.style.transform = '';
-        op1FlipWrap.style.transform = 'rotateX(0deg)';
         op1Scene.classList.add('glow-active');
         STATE = 'COMPLETE';
         op1AsmScrollY = window.scrollY;
         seqT0 = null;
         window.PIXMAP = window.PIXMAP || {};
         window.PIXMAP.netActive = true;
-      }
-    }
 
-    if (STATE === 'SENT_B_PLAYING' && sentBStartT) {
-      var elAuto = (ts - sentBStartT) / 1000;
-      initTextB();
-      var STEP_B = S.TEXT_STEP;
-      var revealDur = wordSpansB.length * STEP_B;
-      var durHold = 3.00;
-      var durOut = S.TEXT_FADE;
-      var totalDur = revealDur + durHold + durOut;
-      var ovIn = Math.min(revealDur, 0.60);
-
-      var sbOp;
-      if (elAuto < revealDur) {
-        showWords(op1SentB, wordSpansB, elAuto / STEP_B);
-        op1SentB.style.visibility = 'visible';
-        op1SentB.style.opacity = '1';
-        sbOp = eio(clamp(elAuto / ovIn, 0, 1));
-      } else if (elAuto < revealDur + durHold) {
-        showWords(op1SentB, wordSpansB, wordSpansB.length);
-        op1SentB.style.visibility = 'visible';
-        op1SentB.style.opacity = '1';
-        sbOp = 1.0;
-      } else if (elAuto < totalDur) {
-        showWords(op1SentB, wordSpansB, wordSpansB.length);
-        sbOp = 1.0 - eio((elAuto - (revealDur + durHold)) / durOut);
-        op1SentB.style.opacity = sbOp.toFixed(3);
-      } else {
-        sbOp = 0;
-      }
-
-      setOverlay(sbOp);
-      op1FlipWrap.style.transform = 'rotateX(180deg)';
-      op1Scene.classList.add('glow-active');
-
-      if (sentBScrollY !== null) window.scrollTo(0, sentBScrollY);
-
-      if (elAuto >= totalDur) {
-        setOverlay(0);
-        setSentB(0);
-        hideText(op1SentB, wordSpansB);
-        STATE = 'POST_B';
-        postBAnchor = window.scrollY;
-        sentBStartT = null;
+        /* Reserve a guaranteed scroll runway below this point for the
+           panel reveal + exit sequence. Height only ever grows here, so
+           the USP runway is untouched. */
+        if (uspSection) {
+          var needPx = (op1AsmScrollY - uspSection.offsetTop) +
+                       NARRATIVE_RUNWAY * window.innerHeight;
+          reservedHeightPx = Math.max(uspSection.offsetHeight, needPx);
+          uspSection.style.height = px(reservedHeightPx);
+        }
       }
     }
   }
@@ -447,15 +387,16 @@
     savedAnchor = null;
     op1AsmScrollY = null;
     seqT0 = null;
-    sentBStartT = null;
-    sentBScrollY = null;
-    postBAnchor = null;
+    exitFwdSaved = null;
+    reservedHeightPx = null;
+    /* Re-hide the finale; the USP scene re-establishes its own section
+       height as the user scrolls back up into USP territory. */
+    hideFinale();
     op1Scene.classList.remove('glow-active');
     op1Scene.style.opacity = '0';
     op1Scene.style.visibility = 'hidden';
     op1Scene.style.transform = '';
     if (op1Img) op1Img.style.opacity = '0';
-    op1FlipWrap.style.transform = '';
     setTiles(-1);
     sem1Bg.style.opacity = '';
     sem1Bg.style.visibility = '';
@@ -466,23 +407,15 @@
         window.PIXMAP.setPatchExit = window.PIXMAP._op1SavedPE;
         delete window.PIXMAP._op1SavedPE;
       }
-      window.PIXMAP._postBExitDone = false;
+      window.PIXMAP._op1ExitDone = false;
     }
     hideGroup(op1Group);
-    hideGroup(op2Group);
-    setOverlay(0);
-    setSentB(0);
     hideText(op1TextEl, wordSpans);
-    hideText(op1SentB, wordSpansB);
   }
 
   function doReversal(backRaw) {
     hideGroup(op1Group);
-    hideGroup(op2Group);
-    op1FlipWrap.style.transform = 'rotateX(0deg)';
-    setOverlay(0);
-    setSentB(0);
-    hideText(op1SentB, wordSpansB);
+    op1Scene.style.transform = '';   /* clear any exit-up shift from before */
 
     var op1T = eio(clamp(backRaw / 0.32, 0, 1));
     setTiles(TILE_TOTAL * (1 - op1T));
@@ -533,8 +466,6 @@
       return;
     }
 
-    if (STATE === 'SENT_B_PLAYING') return;
-
     if (STATE === 'COMPLETE') {
       window.PIXMAP = window.PIXMAP || {};
       if (!savedAnchor) { leave(); return; }
@@ -543,61 +474,79 @@
       var asmAnchor = op1AsmScrollY || savedAnchor;
       var fwd = window.scrollY - asmAnchor;
 
-      if (fwd > 0) {
-        var P1_DRIFT = 0.60 * vh;
-        var P1_EXIT = P1_DRIFT + 0.60 * vh;
-        var FL_START = P1_EXIT;
-        var FL_DUR = 0.80 * vh;
-        var FL_END = FL_START + FL_DUR;
+      /* Staged op1 timeline (scroll-driven):
+         1) REVEAL  : items appear one-by-one
+         2) HOLD    : items stay fully formed (~2 scrolls)
+         3) LIST_UP : the 6 items slide UP and fade out (a clean beat)
+         4) EXIT    : the whole card rises + fades into the finale */
+      var P1_REVEAL = 0.60 * vh;
+      var P1_HOLD   = 0.60 * vh;
+      var P1_LISTUP = 0.55 * vh;
+      var EXIT_START = P1_REVEAL + P1_HOLD + P1_LISTUP;
+      var LIST_RISE = 0.55 * vh;
 
-        if (fwd >= FL_END) {
-          STATE = 'SENT_B_PLAYING';
-          sentBScrollY = window.scrollY;
-          sentBStartT = performance.now();
-          op1FlipWrap.style.transform = 'rotateX(180deg)';
-          op1Scene.classList.add('glow-active');
-          return;
+      var sceneH = op1Scene.offsetHeight ||
+        (op1Scene.getBoundingClientRect && op1Scene.getBoundingClientRect().height) ||
+        (vh * 0.56);
+      var EXIT_DIST = (vh / 2 + getHeaderHeight() / 2) + (sceneH / 2) + 4;
+
+      /* Already handed off to the finale — reversible: scrolling back up
+         un-reveals it once past a small hysteresis band. */
+      if (window.PIXMAP._op1ExitDone) {
+        if (exitFwdSaved !== null && fwd < exitFwdSaved - HANDOFF_HYST) {
+          if (reservedHeightPx !== null && uspSection) {
+            uspSection.style.height = px(reservedHeightPx);
+          }
+          hideFinale();
+          resetFinalLatch();
+          window.PIXMAP._op1ExitDone = false;
+          /* fall through to re-render the panel/exit state below */
+        } else {
+          return;   /* stay in the finale */
         }
+      }
 
+      if (fwd > 0) {
         window.PIXMAP.netActive = true;
         op1Scene.style.visibility = 'visible';
-        op1Scene.style.opacity = '1';
-        op1Scene.style.transform = '';
         setTiles(TILE_TOTAL + 1);
         if (op1Img) op1Img.style.opacity = '1';
         setBaseHidden();
 
-        if (fwd < P1_EXIT) {
-          var p1DriftT = clamp(fwd / P1_DRIFT, 0, 1);
-          var p1MoveY = -(p1DriftT * 32) - (fwd > P1_DRIFT ? fwd - P1_DRIFT : 0);
-          op1Group.wrap.style.visibility = 'visible';
-          var op1Op = 1;
-          if (fwd < 120) op1Op = clamp(fwd / 120, 0, 1);
-          else if (fwd > P1_DRIFT) op1Op = clamp(1 - (fwd - P1_DRIFT) / 150, 0, 1);
-          op1Group.panels.forEach(function (el) {
-            el.classList.add('visible');
-            el.style.opacity = op1Op.toFixed(3);
-            el.style.transform = 'translateY(' + px(p1MoveY) + ')';
-          });
-        } else {
+        /* 1) reveal one-by-one */
+        op1Group.wrap.style.visibility = 'visible';
+        var op1Reveal = clamp(fwd / P1_REVEAL, 0, 1);
+        var op1Shown  = clamp(Math.round(op1Reveal * OP1_PANELS.length), 0, OP1_PANELS.length);
+        op1Group.panels.forEach(function (el, i) {
+          el.classList.toggle('visible', i < op1Shown);
+        });
+        /* 2) hold (P1_HOLD), then slide the whole column UP + fade */
+        var op1Up = clamp((fwd - (P1_REVEAL + P1_HOLD)) / P1_LISTUP, 0, 1);
+        if (op1Up >= 1) {
           hideGroup(op1Group);
+        } else {
+          op1Group.wrap.style.transform = 'translateY(' + px(-op1Up * LIST_RISE) + ')';
+          op1Group.wrap.style.opacity = (1 - op1Up).toFixed(3);
         }
 
-        if (fwd < P1_DRIFT) op1Scene.classList.add('glow-active');
+        /* 3) exit — only after the panels have fully left */
+        var up = fwd > EXIT_START ? (fwd - EXIT_START) : 0;
+        var sceneOp = up > 0 ? clamp(1 - up / EXIT_DIST, 0, 1) : 1;
+        op1Scene.style.opacity = sceneOp.toFixed(3);
+        op1Scene.style.transform = up > 0
+          ? 'translateX(-50%) translateY(calc(-50% - ' + px(up) + '))'
+          : '';
+
+        if (up > 0) op1Scene.classList.remove('glow-active');
+        else if (fwd < P1_REVEAL) op1Scene.classList.add('glow-active');
         else op1Scene.classList.remove('glow-active');
 
-        var flipT = eio(clamp((fwd - FL_START) / FL_DUR, 0, 1));
-        op1FlipWrap.style.transform = 'rotateX(' + (flipT * 180).toFixed(2) + 'deg)';
-        setOverlay(0);
-        setSentB(0);
-        hideGroup(op2Group);
+        if (up >= EXIT_DIST) {
+          completeOp1Handoff(EXIT_START + EXIT_DIST);
+        }
       } else {
         window.PIXMAP.netActive = true;
         hideGroup(op1Group);
-        hideGroup(op2Group);
-        op1FlipWrap.style.transform = 'rotateX(0deg)';
-        setOverlay(0);
-        setSentB(0);
 
         var back = (savedAnchor - window.scrollY) / vh;
         if (back > 0.65) { leave(); return; }
@@ -609,36 +558,9 @@
           op1Scene.style.visibility = 'visible';
           op1Scene.style.transform = '';
           op1Scene.classList.add('glow-active');
-          op1FlipWrap.style.transform = 'rotateX(0deg)';
           setBaseHidden();
         }
       }
-    }
-
-    if (STATE === 'POST_B') {
-      window.PIXMAP = window.PIXMAP || {};
-      var vh2 = window.innerHeight;
-      var fwd2 = window.scrollY - postBAnchor;
-
-      if (fwd2 < 0) {
-        resetFinalLatch();
-        STATE = 'COMPLETE';
-        postBAnchor = null;
-        return;
-      }
-
-      var P2_DRIFT = 0.55 * vh2;
-      var sceneH = op1Scene.offsetHeight || (op1Scene.getBoundingClientRect && op1Scene.getBoundingClientRect().height) || (vh2 * 0.56);
-      var sceneTop = (vh2 / 2) + (getHeaderHeight() / 2);
-      var P2_EXIT = P2_DRIFT + sceneTop + (sceneH / 2) + 4;
-
-      if (fwd2 >= P2_EXIT) {
-        completePostBHandoff(P2_EXIT);
-        return;
-      }
-
-      if (window.PIXMAP._postBExitDone) resetFinalLatch();
-      renderOp2Stage(fwd2, vh2, P2_DRIFT);
     }
   }, { passive: true });
 

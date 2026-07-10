@@ -99,10 +99,19 @@ p, li, h1, h2, h3, h4, h5, span, a, td, th { overflow-wrap: break-word; }
     line-height: 1.6 !important;
     padding-left: clamp(14px, 5vw, 28px) !important;
     padding-right: clamp(14px, 5vw, 28px) !important;
+    text-align: justify !important;
+    text-align-last: justify !important;
   }
-  /* a touch more clearance top/bottom from the logo */
-  .hero-copy.left  { top: calc(var(--header-h) + 6px) !important; }
-  .hero-copy.right { bottom: clamp(28px, 5vh, 56px) !important; }
+  /* Close the gap between paragraphs and logo, with equal fluid spacing on both sides */
+  .hero-copy.left {
+    bottom: auto !important;
+    top: calc((50% + var(--header-h) / 2) - clamp(120px, 42vw, 150px) / 2 - 24px) !important;
+    transform: translateY(-100%) !important;
+  }
+  .hero-copy.right {
+    bottom: auto !important;
+    top: calc((50% + var(--header-h) / 2) + clamp(120px, 42vw, 150px) / 2 + clamp(22px, 4vh, 32px)) !important;
+  }
 }
 
 /* Very short screens (landscape phones): shrink copy further so the
@@ -111,30 +120,213 @@ p, li, h1, h2, h3, h4, h5, span, a, td, th { overflow-wrap: break-word; }
   .hero-copy { font-size: clamp(0.6rem, 2.1vh, 0.8rem) !important; line-height: 1.5 !important; }
 }
 
-/* ---- 3d. USP feature cards: keep within the viewport on phones ----
-   Cards are centred (left:50% + translateX(-50%)); cap their width so
-   the 280px minimum never bumps the edges on a 320px device. */
-@media (max-width: 600px) {
-  .usp-card {
-    width: min(90vw, 360px) !important;
-    padding: 14px clamp(12px, 4vw, 20px) !important;
+/* Hide USP media inside cards on desktop/web (shown via `#uspMedia` instead) */
+.usp-card-media {
+  display: none;
+}
+
+/* ---- 3d. USP cards mobile responsiveness (max-width: 820px) ---- */
+@media (max-width: 820px) {
+
+
+  #sem1Bg {
+    display: block !important;
+    width: 92vw !important;
+    max-width: 92vw !important;
+    max-height: 48vh !important;
+    background-color: transparent !important;
+    border-radius: 8px !important;
+    z-index: 485 !important;
   }
-  .usp-title { font-size: clamp(0.74rem, 4vw, 0.9rem) !important; }
-  .usp-desc  { font-size: clamp(0.72rem, 3.4vw, 0.82rem) !important; line-height: 1.6 !important; }
+
+  #sem1Bg img {
+    border-radius: 8px !important;
+    box-shadow: 0 0 20px rgba(68, 175, 229, 0.2) !important;
+  }
+
+  .usp-highlight-small {
+    transform-origin: center center !important;
+    transform: scale(3.5) !important;
+  }
+
+  #patchFinal {
+    display: block !important;
+    left: 4vw !important;
+    right: 4vw !important;
+    top: calc(50% + var(--header-h) / 2) !important;
+    z-index: 490 !important;
+  }
+
+  #uspMedia {
+    display: block !important;
+    width: clamp(90px, 34vw, 150px) !important;
+    z-index: 492 !important;
+    transform: translate(-50%, 15px) !important;
+  }
+
+  .usp-media-img {
+    max-height: clamp(70px, 10vh, 100px) !important;
+  }
+
+  .usp-media-over {
+    max-height: none !important;
+    max-width: 60vw !important;
+    height: 11vh !important;
+  }
+
+  /* Make each USP card container take up full screen so its children position absolute relative to viewport */
+  .usp-card {
+    position: fixed !important;
+    top: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    padding: 0 !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    pointer-events: none !important;
+    overflow: visible !important;
+  }
+
+  /* Title: uppercase, bold, centered, top of viewport */
+  .usp-title {
+    position: absolute !important;
+    top: calc(50% + var(--header-h) / 2 - clamp(130px, 32vw, 210px)) !important;
+    left: 10px !important;
+    right: 10px !important;
+    text-align: center !important;
+    font-family: 'Outfit', 'Open Sans', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: clamp(0.85rem, 3.8vw, 1.05rem) !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95) !important;
+    margin-bottom: 0 !important;
+    z-index: 490 !important;
+  }
+
+  /* Let children of card-body escape flow and absolute-position relative to card */
+  .usp-card-body {
+    display: contents !important;
+  }
+
+  /* Description (subheading): centered over the upper-middle of sem1Bg, smaller font */
+  .usp-desc {
+    position: absolute !important;
+    top: calc(50% + var(--header-h)/2 - clamp(80px, 20vw, 130px)) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    display: inline-block !important;
+    width: fit-content !important;
+    max-width: 200px !important;
+    text-align: center !important;
+    font-family: 'Open Sans', sans-serif !important;
+    font-weight: 400 !important;
+    font-size: clamp(0.52rem, 2.2vw, 0.64rem) !important;
+    line-height: 1.45 !important;
+    letter-spacing: -0.01em !important;
+    color: rgba(240, 248, 255, 0.98) !important;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.98), 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+    z-index: 490 !important;
+    margin: 0 auto !important;
+  }
+
+  /* Hide the card's local media since we use the global animated #uspMedia */
+  .usp-card-media {
+    display: none !important;
+  }
+
+  /* Rapid Patch Workflow overrides (Active index 0) */
+  body.active-idx-0 #patchFinal {
+    display: none !important;
+  }
+  body.active-idx-0 #uspMedia {
+    width: clamp(80px, 30vw, 130px) !important;
+  }
+  body.active-idx-0 .usp-media-img {
+    max-height: clamp(50px, 9vh, 80px) !important;
+  }
+  body.active-idx-0 .usp-media-over {
+    height: 8vh !important;
+  }
+  body.active-idx-0 .usp-desc {
+    font-size: clamp(0.48rem, 2.0vw, 0.58rem) !important;
+    width: 54vw !important;
+    max-width: 180px !important;
+    line-height: 1.40 !important;
+    top: calc(50% + var(--header-h)/2 - clamp(72px, 18vw, 115px)) !important;
+  }
+  body.active-idx-0 .usp-title {
+    font-size: clamp(0.92rem, 4.2vw, 1.15rem) !important;
+  }
 }
 
-/* ---- 3e. Supporting feature media: never exceed the screen ---- */
+/* ---- 3e. op1 scene mobile responsiveness ---- */
+@media (max-width: 820px) {
+  #op1Scene {
+    width: min(92vw, calc((100vh - var(--header-h) - 100px) * 1.77778)) !important;
+  }
+}
+
+/* ---- 3f. Narrative panels layout (3 above, 3 below the image on mobile) ---- */
+@media (max-width: 820px) {
+  .op1-panel {
+    display: block !important;
+    position: fixed !important;
+    border-radius: 4px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
+    padding: 0 !important;
+    transform: translateY(12px) !important;
+    transition: opacity 0.5s ease, transform 0.5s ease !important;
+  }
+
+  .op1-panel.visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  .op1-panel-inner {
+    padding: 8px 8px !important;
+    min-height: auto !important;
+  }
+
+  .op1-panel-title {
+    font-size: clamp(0.44rem, 2.0vw, 0.54rem) !important;
+    margin-bottom: 2px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  .op1-panel-desc {
+    font-size: clamp(0.38rem, 1.7vw, 0.48rem) !important;
+    line-height: 1.25 !important;
+    text-align: justify !important;
+    text-align-last: center !important;
+    display: block !important;
+    overflow: visible !important;
+    -webkit-line-clamp: unset !important;
+    line-clamp: none !important;
+  }
+}
+
+/* ---- 3g. Final CTA font scale on mobile ---- */
 @media (max-width: 600px) {
-  #uspMedia      { width: min(82vw, 320px) !important; }
-  .usp-media-img { max-height: 26vh !important; }
-  .usp-media-lg  { max-height: 30vh !important; max-width: 82vw !important; }
-}
-
-/* ---- 3f. Floating glass panels over the output image ----
-   Hidden on phones where there is no room for them beside the image
-   (they are decorative; the image + text carry the meaning). */
-@media (max-width: 768px) {
-  .op1-panel { display: none !important; }
+  #finalCta p {
+    font-size: clamp(0.95rem, 5vw, 1.2rem) !important;
+    line-height: 1.65 !important;
+    text-align: justify !important;
+    text-align-last: justify !important;
+  }
 }
 
 /* ============================================================
@@ -169,6 +361,71 @@ p, li, h1, h2, h3, h4, h5, span, a, td, th { overflow-wrap: break-word; }
 @media (max-width: 420px) {
   .pricing-card  { padding: 28px 18px 22px !important; }
   .popular-badge { white-space: nowrap; }
+}
+
+/* ------------------------------------------------------------
+   ADDITIONAL MOBILE REINFORCEMENTS (width <= 600px)
+   ------------------------------------------------------------ */
+@media (max-width: 600px) {
+  /* Prevent scroll behind nav */
+  body.nav-open {
+    overflow: hidden !important;
+  }
+
+  /* Shrink 3D logo to prevent tagline overlap */
+  #logo3d {
+    width: clamp(120px, 42vw, 150px) !important;
+  }
+
+
+
+  /* Fix form modal wrappers overflow by clearing margin */
+  .modal-wrapper {
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .restore-container {
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Position op1Text to middle, centered and justified on phone */
+  #op1Text {
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    white-space: normal !important;
+    width: 82vw !important;
+    max-width: 290px !important;
+    font-size: clamp(0.78rem, 3.6vw, 0.95rem) !important;
+    line-height: 1.65 !important;
+    text-align: center !important;
+  }
+
+  /* Reposition icon1Text to clear centered icon1 */
+  #icon1Text {
+    top: calc(50% + 80px) !important;
+    font-size: clamp(0.82rem, 4vw, 1.05rem) !important;
+  }
+}
+
+
+
+
+/* Mobile sizes override */
+@media (max-width: 820px) {
+  body.active-idx-3 #uspMedia,
+  body.active-idx-5 #uspMedia,
+  body.active-idx-6 #uspMedia {
+    width: clamp(80px, 30vw, 140px) !important;
+  }
+  body.active-idx-3 .usp-media-img,
+  body.active-idx-5 .usp-media-img,
+  body.active-idx-6 .usp-media-img {
+    max-height: clamp(65px, 9vh, 95px) !important;
+  }
 }
 
 /* Manual page (long-form doc) only had one breakpoint — add phone

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PIX MAP User Manual</title>
+<title>PIXMAP User Manual</title>
 <style>
 
 /* =============================================================
@@ -72,6 +72,21 @@ a:hover { text-decoration: underline; }
   padding: 28px 20px 22px;
   border-bottom: 1px solid var(--border);
 }
+.nav-back-btn {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  text-decoration: none;
+  transition: color 0.2s;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.nav-back-btn:hover {
+  color: var(--text);
+  text-decoration: none;
+}
 .nav-header .logo {
   font-size: 16px;
   font-weight: 700;
@@ -86,29 +101,6 @@ a:hover { text-decoration: underline; }
   letter-spacing: .06em;
   text-transform: uppercase;
 }
-.nav-header a.logo { text-decoration: none; display: inline-block; }
-.back-to-site {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: 16px;
-  padding: 8px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .03em;
-  color: var(--text2);
-  text-decoration: none;
-  background: var(--accent-lo);
-  border: 1px solid var(--border2);
-  border-radius: 7px;
-  transition: color .2s ease, background .2s ease, border-color .2s ease;
-}
-.back-to-site:hover {
-  color: var(--text);
-  background: var(--accent-mid);
-  border-color: var(--accent);
-}
-.back-to-site .arrow { font-size: 14px; line-height: 1; }
 
 .nav-section { padding: 20px 0 4px; }
 .nav-section-title {
@@ -157,6 +149,32 @@ a:hover { text-decoration: underline; }
   position: relative;
   overflow: hidden;
 }
+.top-back-btn {
+  position: absolute;
+  top: 32px;
+  left: 72px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  text-decoration: none;
+  transition: color 0.2s, transform 0.2s;
+  z-index: 100;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.top-back-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.5;
+}
+.top-back-btn:hover {
+  color: var(--text);
+  text-decoration: none;
+  transform: translateX(-3px);
+}
 
 /* cover has no decorative overlay */
 #cover::before {
@@ -173,7 +191,7 @@ a:hover { text-decoration: underline; }
   position: relative;
 }
 .cover-title {
-  font-size: clamp(40px, 3.542vw, 84px); /* 68px at 1920, scales 1366→4K */
+  font-size: 68px;
   font-weight: 800;
   letter-spacing: -.03em;
   line-height: 1.05;
@@ -185,7 +203,7 @@ a:hover { text-decoration: underline; }
   color: var(--accent);
 }
 .cover-subtitle {
-  font-size: clamp(15px, 1.042vw, 24px); /* 20px at 1920 */
+  font-size: 20px;
   font-weight: 500;
   color: var(--text2);
   margin-bottom: 48px;
@@ -244,7 +262,7 @@ a:hover { text-decoration: underline; }
 }
 
 h2 {
-  font-size: clamp(26px, 1.979vw, 46px); /* 38px at 1920 */
+  font-size: 38px;
   font-weight: 800;
   letter-spacing: -.02em;
   color: var(--text);
@@ -615,20 +633,138 @@ p:last-child { margin-bottom: 0; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
+/* Hide drawer elements by default on desktop screen sizes */
+.manual-nav-toggle {
+  display: none;
+}
+.manual-nav-overlay {
+  display: none;
+}
+
 /* =============================================================
    RESPONSIVE
    ============================================================= */
 @media (max-width: 860px) {
-  #nav { display: none; }
-  #page { margin-left: 0; }
-  .section, .step-block, #cover { padding: 48px 28px; }
-  .cover-title { font-size: 44px; }
-  .zone-grid, .mask-grid { grid-template-columns: 1fr; }
-  h2 { font-size: 28px; }
+  /* Turn sidebar into a sliding drawer menu */
+  #nav {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: 280px;
+    height: 100%;
+    z-index: 10000;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.6);
+    background: var(--bg2);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #nav.open {
+    transform: translateX(0);
+  }
+
+  #page {
+    margin-left: 0;
+  }
+
+  .top-back-btn {
+    left: 20px !important;
+    top: 20px !important;
+  }
+
+  .section, .step-block, #cover {
+    padding: 48px 20px;
+  }
+
+  .cover-title {
+    font-size: clamp(32px, 8vw, 44px);
+  }
+
+  .zone-grid, .mask-grid {
+    grid-template-columns: 1fr;
+  }
+
+  h2 {
+    font-size: 26px;
+  }
+
+  /* Table and Code block responsive hardening */
+  pre, code {
+    white-space: pre-wrap !important;
+    word-break: break-word;
+  }
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Floating toggle button for mobile nav */
+  .manual-nav-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    background: rgba(17, 19, 22, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10002;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .manual-nav-toggle span {
+    display: block;
+    width: 18px;
+    height: 1.5px;
+    background: #ffffff;
+    border-radius: 1px;
+    transition: transform 0.28s ease, opacity 0.28s ease;
+  }
+
+  .manual-nav-toggle.open span:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+  }
+  .manual-nav-toggle.open span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  .manual-nav-toggle.open span:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+  }
+
+  /* Overlay backdrop */
+  .manual-nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .manual-nav-overlay.open {
+    display: block;
+    opacity: 1;
+  }
 }
 
+
 </style>
-<link rel="stylesheet" href="../../css/responsive.css?v=20260626">
 </head>
 <body>
 
@@ -637,9 +773,8 @@ p:last-child { margin-bottom: 0; }
      ══════════════════════════════════════════════ -->
 <nav id="nav">
   <div class="nav-header">
-    <a class="logo" href="../../index.html"><span>PIX</span> MAP</a>
+    <div class="logo">PIXMAP</div>
     <div class="version">User Manual · 2026</div>
-    <a class="back-to-site" href="../../index.html"><span class="arrow">←</span> Back to website</a>
   </div>
 
   <div class="nav-section">
@@ -684,10 +819,28 @@ p:last-child { margin-bottom: 0; }
   </div>
 
   <div class="nav-section">
+    <div class="nav-section-title">Advanced Output</div>
+    <a class="nav-item" href="#advanced-output">Advanced Output</a>
+    <a class="nav-item sub" href="#ao-how">How It Works</a>
+    <a class="nav-item sub" href="#ao-screens">Screens &amp; Processors</a>
+    <a class="nav-item sub" href="#ao-input">Input Selection</a>
+    <a class="nav-item sub" href="#ao-output">Output Transformation</a>
+    <a class="nav-item sub" href="#ao-slices">Slices &amp; Splitting</a>
+    <a class="nav-item sub" href="#ao-xml">Resolume XML</a>
+    <a class="nav-item sub" href="#ao-steps">Using It — Steps</a>
+  </div>
+
+  <div class="nav-section">
     <div class="nav-section-title">Reference</div>
     <a class="nav-item" href="#best-practices">Best Practices</a>
   </div>
 </nav>
+
+<!-- Mobile Navigation Toggle & Backdrop overlay -->
+<button id="manualNavToggle" aria-label="Toggle Table of Contents" class="manual-nav-toggle">
+  <span></span><span></span><span></span>
+</button>
+<div id="manualNavOverlay" class="manual-nav-overlay"></div>
 
 <!-- ══════════════════════════════════════════════
      PAGE
@@ -698,10 +851,17 @@ p:last-child { margin-bottom: 0; }
        COVER
        ──────────────────────────────────────────── -->
   <section id="cover" class="section" style="padding: 80px 72px; min-height: 100vh; justify-content: center; display: flex; flex-direction: column; border-bottom: 1px solid var(--border); background: var(--bg); position: relative; overflow: hidden;">
+    <a href="../../" class="top-back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Website
+    </a>
     <div style="position:relative;">
       <div class="cover-eyebrow">Official Documentation</div>
       <div class="cover-title">
-        <span class="highlight">PIX</span><span style="color:var(--text);"> MAP</span><br />User Manual
+        PIXMAP<br />User Manual
       </div>
       <p class="cover-subtitle" style="margin-top:16px; max-width:none;">
         Professional LED pixel mapping design tool for planning,<br />
@@ -723,10 +883,10 @@ p:last-child { margin-bottom: 0; }
        ──────────────────────────────────────────── -->
   <section id="introduction" class="section">
     <div class="eyebrow">01 · Introduction</div>
-    <h2>What is PIX MAP?</h2>
+    <h2>What is PIXMAP?</h2>
 
     <p>
-      PIX MAP is a professional desktop application for designing, planning, and exporting
+      PIXMAP is a professional desktop application for designing, planning, and exporting
       LED pixel mapping layouts. It gives LED technicians, AV engineers, and production designers
       a dedicated visual environment to define how LED panels are physically arranged, configured,
       and indexed, before any hardware is installed on site.
@@ -739,11 +899,11 @@ p:last-child { margin-bottom: 0; }
       expensive, time-consuming problem discovered on the day.
     </p>
     <p>
-      PIX MAP solves this by replacing guesswork, spreadsheets, and generic design tools with a
+      PIXMAP solves this by replacing guesswork, spreadsheets, and generic design tools with a
       single purpose-built workspace that understands the language of LED pixel mapping.
     </p>
 
-    <h3>Who Is PIX MAP Designed For?</h3>
+    <h3>Who Is PIXMAP Designed For?</h3>
 
     <div class="zone-grid">
       <div class="zone-card">
@@ -789,14 +949,14 @@ p:last-child { margin-bottom: 0; }
     <div class="eyebrow">02 · Interface</div>
     <h2>Application Interface Overview</h2>
     <p>
-      PIX MAP is organized into five distinct interface zones. Each zone has a specific role,
+      PIXMAP is organized into five distinct interface zones. Each zone has a specific role,
       and together they provide a complete pixel mapping design environment. New users should
       familiarize themselves with these zones before beginning a project.
     </p>
 
     <!-- Interface screenshot -->
     <div style="width:100%; margin:32px 0 28px; border-radius:12px; overflow:hidden; border:1px solid var(--border); background:var(--card);">
-      <img src="X1.PNG" alt="PIX MAP application interface" style="width:100%; display:block;" />
+      <img src="G1/X1.PNG" alt="PIXMAP application interface" style="width:100%; display:block;" />
     </div>
 
     <div class="zone-grid" style="grid-template-columns:1fr;">
@@ -870,7 +1030,7 @@ p:last-child { margin-bottom: 0; }
   <section id="project-setup" class="section" style="padding-top:48px;">
     <h3 style="margin-top:0;">Project Setup Wizard</h3>
     <p>
-      Every PIX MAP session begins with the Project Setup Wizard. This dialog appears
+      Every PIXMAP session begins with the Project Setup Wizard. This dialog appears
       automatically when creating a new project and collects the foundational parameters
       that define the scale, resolution, and hardware context of the entire canvas.
       All downstream measurements, pixel counts, and panel calculations are derived
@@ -913,7 +1073,7 @@ p:last-child { margin-bottom: 0; }
   <section id="canvas-workspace" class="section" style="padding-top:48px;">
     <h3 style="margin-top:0;">Canvas Workspace</h3>
     <p>
-      The canvas is the central viewport of PIX MAP and the primary design environment
+      The canvas is the central viewport of PIXMAP and the primary design environment
       for LED layout work. It is an infinite, pannable, and zoomable workspace where
       LED surfaces, masks, and reference images are placed and spatially arranged.
     </p>
@@ -997,7 +1157,7 @@ p:last-child { margin-bottom: 0; }
   <section id="led-surfaces" class="section" style="padding-top:48px;">
     <h3 style="margin-top:0;">LED Surfaces</h3>
     <p>
-      An LED surface is the primary object type in PIX MAP. Each surface represents a physical
+      An LED surface is the primary object type in PIXMAP. Each surface represents a physical
       LED panel array, a defined grid of LED modules that together form a single display
       region. Surfaces are the building blocks of every pixel mapping project.
     </p>
@@ -1048,7 +1208,7 @@ p:last-child { margin-bottom: 0; }
   <section id="surface-styling" class="section" style="padding-top:48px;">
     <h3 style="margin-top:0;">Surface Styling</h3>
     <p>
-      Visual styling controls in PIX MAP determine how surfaces appear on the canvas.
+      Visual styling controls in PIXMAP determine how surfaces appear on the canvas.
       These settings are for planning clarity only, they affect the visual representation
       of the surface during design but do not influence the pixel mapping output data.
     </p>
@@ -1078,7 +1238,7 @@ p:last-child { margin-bottom: 0; }
     <p>
       Masks are shapes applied on top of LED surfaces to define non-rectangular active
       display areas. In live production and event design, LED displays are frequently
-      circular, triangular, hexagonal, or entirely custom in form. PIX MAP's masking
+      circular, triangular, hexagonal, or entirely custom in form. PIXMAP's masking
       system allows these shapes to be precisely defined and included in all export outputs.
     </p>
     <p>
@@ -1150,7 +1310,7 @@ p:last-child { margin-bottom: 0; }
   <section id="canvas-tools" class="section" style="padding-top:48px;">
     <h3 style="margin-top:0;">Canvas Tools</h3>
     <p>
-      In addition to surface and mask editing, PIX MAP provides auxiliary canvas tools
+      In addition to surface and mask editing, PIXMAP provides auxiliary canvas tools
       that improve layout accuracy, assist with navigation, and help prepare the workspace
       for export.
     </p>
@@ -1194,7 +1354,7 @@ p:last-child { margin-bottom: 0; }
     <div class="eyebrow">04 · Workflow</div>
     <h2>Workflow Illustration</h2>
     <p>
-      The following walkthrough demonstrates a complete PIX MAP project, from initial
+      The following walkthrough demonstrates a complete PIXMAP project, from initial
       setup through to final export. Each step includes an animated demonstration and
       an explanation of what is happening and why it matters in the broader
       LED mapping workflow.
@@ -1227,7 +1387,7 @@ p:last-child { margin-bottom: 0; }
           being planned.
         </p>
         <div class="gif-wrap">
-          <img src="1.gif" alt="Step 1, Starting a new PIX MAP project" loading="lazy" />
+          <img src="G1/1.gif" alt="Step 1, Starting a new PIXMAP project" loading="lazy" />
           <div class="gif-bar">Project Setup Wizard, project name, resolution, and pixel pitch</div>
         </div>
         <div class="step-why">
@@ -1255,7 +1415,7 @@ p:last-child { margin-bottom: 0; }
           the physical modules being installed.
         </p>
         <div class="gif-wrap">
-          <img src="2.gif" alt="Step 2, Creating a custom LED panel size" loading="lazy" />
+          <img src="G1/2.gif" alt="Step 2, Creating a custom LED panel size" loading="lazy" />
           <div class="gif-bar">Defining a custom panel specification, pixel dimensions and pitch</div>
         </div>
         <div class="step-why">
@@ -1283,7 +1443,7 @@ p:last-child { margin-bottom: 0; }
           during the design process.
         </p>
         <div class="gif-wrap">
-          <img src="3.gif" alt="Step 3, Uploading a brand logo to the canvas" loading="lazy" />
+          <img src="G1/3.gif" alt="Step 3, Uploading a brand logo to the canvas" loading="lazy" />
           <div class="gif-bar">Importing a reference graphic as a canvas guide layer</div>
         </div>
         <div class="step-why">
@@ -1308,11 +1468,11 @@ p:last-child { margin-bottom: 0; }
         <p>
           With the canvas initialized and any reference imagery in place, the first LED surface
           can be created. A surface is defined by specifying the number of panel rows and columns
-          and selecting the panel type. PIX MAP immediately renders the surface on the canvas
+          and selecting the panel type. PIXMAP immediately renders the surface on the canvas
           as a panel grid, providing a real-time visual representation of the LED array.
         </p>
         <div class="gif-wrap">
-          <img src="4.gif" alt="Step 4, Adding the first LED surface" loading="lazy" />
+          <img src="G1/4.gif" alt="Step 4, Adding the first LED surface" loading="lazy" />
           <div class="gif-bar">Creating the first LED surface, defining rows, columns, and panel type</div>
         </div>
         <div class="step-why">
@@ -1338,11 +1498,11 @@ p:last-child { margin-bottom: 0; }
           Most professional LED installations involve multiple independent display zones.
           A stage production might include a main center screen, left and right wing panels,
           floor tiles, and ceiling rigs, each representing a distinct LED surface with its
-          own panel count and configuration. In PIX MAP, each zone is added as a separate
+          own panel count and configuration. In PIXMAP, each zone is added as a separate
           surface on the canvas.
         </p>
         <div class="gif-wrap">
-          <img src="5.gif" alt="Step 5, Adding multiple LED surfaces" loading="lazy" />
+          <img src="G1/5.gif" alt="Step 5, Adding multiple LED surfaces" loading="lazy" />
           <div class="gif-bar">Adding additional surfaces to represent a multi-zone LED installation</div>
         </div>
         <div class="step-why">
@@ -1370,7 +1530,7 @@ p:last-child { margin-bottom: 0; }
           can be given a name that directly communicates its physical role in the installation, such as "Main Screen," "Stage Left Wing," "Floor Riser 1," or "Ceiling Truss."
         </p>
         <div class="gif-wrap">
-          <img src="6.gif" alt="Step 6, Naming LED surfaces" loading="lazy" />
+          <img src="G1/6.gif" alt="Step 6, Naming LED surfaces" loading="lazy" />
           <div class="gif-bar">Assigning descriptive names to each surface in the layers panel</div>
         </div>
         <div class="step-why">
@@ -1399,7 +1559,7 @@ p:last-child { margin-bottom: 0; }
           that avoids applying similar hues to adjacent surfaces.
         </p>
         <div class="gif-wrap">
-          <img src="7.gif" alt="Step 7, Using the One-Click Color Shifter" loading="lazy" />
+          <img src="G1/7.gif" alt="Step 7, Using the One-Click Color Shifter" loading="lazy" />
           <div class="gif-bar">One-Click Color Shifter, automatic color differentiation across all surfaces</div>
         </div>
         <div class="step-why">
@@ -1428,7 +1588,7 @@ p:last-child { margin-bottom: 0; }
           surface grid, accurately representing physical gaps in an otherwise regular array.
         </p>
         <div class="gif-wrap">
-          <img src="8.gif" alt="Step 8, Editing the LED panel grid" loading="lazy" />
+          <img src="G1/8.gif" alt="Step 8, Editing the LED panel grid" loading="lazy" />
           <div class="gif-bar">Removing individual panel cells within a surface grid</div>
         </div>
         <div class="step-why">
@@ -1456,7 +1616,7 @@ p:last-child { margin-bottom: 0; }
           more prominently than smaller adjacent ones.
         </p>
         <div class="gif-wrap">
-          <img src="10.gif" alt="Step 9, Customizing surface labels" loading="lazy" />
+          <img src="G1/10.gif" alt="Step 9, Customizing surface labels" loading="lazy" />
           <div class="gif-bar">Adjusting label color and font size for improved canvas clarity</div>
         </div>
         <div class="step-why">
@@ -1485,7 +1645,7 @@ p:last-child { margin-bottom: 0; }
           visible window at an appropriate zoom level.
         </p>
         <div class="gif-wrap">
-          <img src="15.gif" alt="Step 10, Fit Canvas to Content" loading="lazy" />
+          <img src="G1/15.gif" alt="Step 10, Fit Canvas to Content" loading="lazy" />
           <div class="gif-bar">Fit Canvas to Content, auto-adjusting the viewport to frame all project objects</div>
         </div>
         <div class="step-why">
@@ -1514,7 +1674,7 @@ p:last-child { margin-bottom: 0; }
           non-standard LED display forms in live production and event environments.
         </p>
         <div class="gif-wrap">
-          <img src="11.gif" alt="Step 11, Applying basic shape masks" loading="lazy" />
+          <img src="G1/11.gif" alt="Step 11, Applying basic shape masks" loading="lazy" />
           <div class="gif-bar">Applying a geometric mask to define a non-rectangular active display region</div>
         </div>
         <div class="step-why">
@@ -1543,7 +1703,7 @@ p:last-child { margin-bottom: 0; }
           back to the first point. The resulting polygon is applied as a precision mask.
         </p>
         <div class="gif-wrap">
-          <img src="12.gif" alt="Step 12, Drawing a custom polygon mask" loading="lazy" />
+          <img src="G1/12.gif" alt="Step 12, Drawing a custom polygon mask" loading="lazy" />
           <div class="gif-bar">Custom polygon tool, drawing a freeform closed mask shape</div>
         </div>
         <div class="step-why">
@@ -1568,11 +1728,11 @@ p:last-child { margin-bottom: 0; }
         <p>
           When a mask shape has been prepared externally, as part of a brand identity package,
           stage design asset, or graphic cutout, it can be imported directly as a PNG file.
-          PIX MAP reads the alpha channel of the imported PNG to define the mask boundary,
+          PIXMAP reads the alpha channel of the imported PNG to define the mask boundary,
           enabling highly complex shapes to be used without manual polygon drawing.
         </p>
         <div class="gif-wrap">
-          <img src="13.gif" alt="Step 13, Importing a PNG mask" loading="lazy" />
+          <img src="G1/13.gif" alt="Step 13, Importing a PNG mask" loading="lazy" />
           <div class="gif-bar">PNG mask import, using the alpha channel to define the active mask boundary</div>
         </div>
         <div class="step-why">
@@ -1596,12 +1756,12 @@ p:last-child { margin-bottom: 0; }
       <div class="step-body">
         <p>
           When the layout is complete and all surfaces, masks, and configurations have been
-          verified, the project is ready for export. PIX MAP supports three export modes
+          verified, the project is ready for export. PIXMAP supports three export modes
           that can be selected and downloaded simultaneously, giving technicians all
           required production files in a single operation.
         </p>
         <div class="gif-wrap">
-          <img src="14.gif" alt="Step 14, Exporting the layout" loading="lazy" />
+          <img src="G1/14.gif" alt="Step 14, Exporting the layout" loading="lazy" />
           <div class="gif-bar">Export panel, selecting export modes and generating production output files</div>
         </div>
 
@@ -1637,10 +1797,237 @@ p:last-child { margin-bottom: 0; }
   </div><!-- /workflow-steps -->
 
   <!-- ────────────────────────────────────────────
+       ADVANCED OUTPUT
+       ──────────────────────────────────────────── -->
+  <section id="advanced-output" class="section">
+    <div class="eyebrow">05 · Advanced Output</div>
+    <h2>Advanced Output — Slicing for Video Processors</h2>
+    <p>
+      Advanced Output is where a finished pixel map becomes real, deliverable video-processor
+      outputs. Once the physical LED layout has been designed on the canvas, Advanced Output lets you
+      cut that layout into <strong>slices</strong> and arrange them onto one or more
+      <strong>output screens</strong> — exactly the way a media server such as Resolume Arena maps a
+      composition onto its outputs. Each slice defines <em>which part of the content it takes</em>
+      (its input) and <em>where that content is placed on the processor</em> (its output).
+    </p>
+    <p>
+      The workflow mirrors the professional input / output model used across the industry: a single
+      composition is sampled by many slices, and each slice is transformed independently onto the
+      output canvas. This is what makes irregular walls, split screens, wings, floors and ceilings all
+      driveable from standard rectangular processor outputs.
+    </p>
+
+    <!-- Advanced Output — live demo (mp4 converted to gif) -->
+    <div style="width:100%; margin:32px 0 28px; border-radius:12px; overflow:hidden; border:1px solid var(--border); background:var(--card);">
+      <img src="../vid1.gif" alt="Advanced Output in PIXMAP — input selection and output transformation demo" loading="lazy" style="width:100%; display:block;" />
+    </div>
+
+    <div class="callout info">
+      <div class="callout-label">Two Tabs, One Model</div>
+      Advanced Output always has two views, switched at the top of the workspace:
+      <strong>Input Selection</strong> (what each slice samples from the composition) and
+      <strong>Output Transformation</strong> (where each slice lands on the physical output). This is
+      the same Input / Output separation Resolume uses in its Advanced Output editor.
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="ao-how" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">How It Works</h3>
+    <p>
+      Advanced Output sits between the design canvas and the physical hardware. The full designed
+      canvas becomes the <strong>composition</strong> — the source picture. You then add one or more
+      <strong>screens</strong>, where each screen represents a single video processor or output
+      device with its own pixel resolution. Finally you cut the composition into <strong>slices</strong>,
+      and each slice carries two rectangles: an <strong>input rectangle</strong> (the region of the
+      composition it samples) and an <strong>output rectangle</strong> (its position, size and rotation
+      on the screen).
+    </p>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:200px;">Concept</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Composition</code></td><td>The complete designed canvas at its full resolution — the single source picture every slice samples from.</td></tr>
+        <tr><td><code>Screen</code></td><td>One physical output / video processor, with its own resolution (for example 3840 × 2160). A project can contain several screens.</td></tr>
+        <tr><td><code>Slice</code></td><td>A rectangular region that takes a piece of the composition and places it onto a screen. Slices are the unit of mapping.</td></tr>
+        <tr><td><code>Input Rectangle</code></td><td>The area of the composition the slice reads from — set on the <strong>Input Selection</strong> tab.</td></tr>
+        <tr><td><code>Output Rectangle</code></td><td>The destination on the screen — position, width, height and rotation — set on the <strong>Output Transformation</strong> tab.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Screens & Processors -->
+  <section id="ao-screens" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Screens &amp; Processors</h3>
+    <p>
+      Screens are managed from the list on the left of the Advanced Output workspace. Each screen is
+      treated as one processor output — add a screen for every physical processor in the rig, set its
+      resolution, and assign slices to it. A default reference screen mirrors the composition so you
+      always have a starting point; additional screens are created as needed for multi-processor
+      installations.
+    </p>
+
+    <div class="callout tip">
+      <div class="callout-label">Tip</div>
+      Give each screen the exact resolution of its real processor output. The slices you place on that
+      screen are then delivered at true 1:1 pixel accuracy, and the exported files and XML match the
+      hardware without rescaling.
+    </div>
+  </section>
+
+  <!-- Input Selection -->
+  <section id="ao-input" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Input Selection</h3>
+    <p>
+      The <strong>Input Selection</strong> tab defines <em>what each slice takes from the
+      composition</em>. Here the composition is shown as the source picture, and each slice is a
+      rectangle laid over it. Move and size that rectangle to choose the exact region of content the
+      slice will carry to its output — identical in purpose to the Input rectangle in Resolume's
+      Advanced Output.
+    </p>
+
+    <div class="zone-grid" style="grid-template-columns:1fr;">
+      <div class="zone-card" style="display:flex;gap:18px;align-items:flex-start;border-left:3px solid #16a34a;background:rgba(22,163,74,.04);">
+        <div style="flex-shrink:0;width:42px;height:42px;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.35);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#16a34a;">&#9713;</div>
+        <div>
+          <div class="zc-zone" style="color:#16a34a;">Input Selection Tab</div>
+          <div class="zc-name" style="font-size:16px;margin-bottom:6px;">Source Region</div>
+          <p class="zc-desc">Position the slice's input rectangle over the part of the composition it should display. This is the crop of the source content — the pixels the processor output will actually show.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Selection screenshot -->
+    <div style="width:100%; margin:28px 0; border-radius:12px; overflow:hidden; border:1px solid var(--border); background:var(--card);">
+      <img src="../ip.PNG" alt="Input Selection tab in Advanced Output" loading="lazy" style="width:100%; display:block;" />
+    </div>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:200px;">Input Property</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Input Position</code></td><td>The X / Y coordinates of the slice's source rectangle within the composition.</td></tr>
+        <tr><td><code>Input Size</code></td><td>The width × height of the region sampled from the composition.</td></tr>
+        <tr><td><code>Layout Reference</code></td><td>The Input view represents the physical wall layout, so it is also the basis used later for power planning in LED Wiring.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Output Transformation -->
+  <section id="ao-output" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Output Transformation</h3>
+    <p>
+      The <strong>Output Transformation</strong> tab defines <em>where each slice lands on the
+      physical output</em>. Switch to this tab to position, scale, rotate and flip every slice onto the
+      selected screen's canvas. What you arrange here is exactly what the video processor sends to the
+      LED wall — the same role as the Output rectangle in Resolume.
+    </p>
+
+    <div class="zone-grid" style="grid-template-columns:1fr;">
+      <div class="zone-card" style="display:flex;gap:18px;align-items:flex-start;border-left:3px solid #1e40af;background:rgba(30,64,175,.05);">
+        <div style="flex-shrink:0;width:42px;height:42px;background:rgba(30,64,175,.12);border:1px solid rgba(30,64,175,.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#3b6fe0;">&#9714;</div>
+        <div>
+          <div class="zc-zone" style="color:#3b6fe0;">Output Transformation Tab</div>
+          <div class="zc-name" style="font-size:16px;margin-bottom:6px;">Destination on the Processor</div>
+          <p class="zc-desc">Place each slice on the output screen. Drag to position, resize with the handles, rotate to any angle, and flip to match the physical orientation of the panels. This is the final map the processor drives.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output Transformation screenshot -->
+    <div style="width:100%; margin:28px 0; border-radius:12px; overflow:hidden; border:1px solid var(--border); background:var(--card);">
+      <img src="../op.PNG" alt="Output Transformation tab in Advanced Output" loading="lazy" style="width:100%; display:block;" />
+    </div>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:200px;">Output Property</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Output Position</code></td><td>The X / Y coordinates of the slice on the output screen canvas.</td></tr>
+        <tr><td><code>Output Size</code></td><td>The width × height of the slice on the screen. Scaling here maps the sampled input onto the destination area.</td></tr>
+        <tr><td><code>Rotation</code></td><td>Rotate the slice to any angle. Rotation is preserved through to LED Wiring and is baked into the exported Resolume geometry so the slice lands rotated in the media server too.</td></tr>
+        <tr><td><code>Flip X / Flip Y</code></td><td>Mirror the slice horizontally or vertically to match the physical panel orientation.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Slices & Splitting -->
+  <section id="ao-slices" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Slices &amp; Splitting</h3>
+    <p>
+      Slices are created from the surfaces you designed on the canvas, and can be divided further to
+      match how the content is distributed across processors and ports. A slice can be split into
+      <strong>Left / Right</strong> or <strong>Top / Bottom</strong> halves, either automatically (an
+      even 50 / 50 cut) or with a custom tile count on each side. Aspect-ratio lock keeps proportions
+      correct while resizing.
+    </p>
+
+    <table class="ptable">
+      <thead>
+        <tr><th style="width:200px;">Slice Action</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Split L / R · T / B</code></td><td>Divide a slice into two along a vertical or horizontal cut, following the panel grid.</td></tr>
+        <tr><td><code>Half (Auto) / Custom</code></td><td>Split evenly down the middle, or specify exactly how many tiles go to each side.</td></tr>
+        <tr><td><code>AR Lock</code></td><td>Maintain the slice's width / height ratio while resizing.</td></tr>
+        <tr><td><code>Match Input &#8594; Output</code></td><td>Copy the input rectangle's shape onto the output rectangle (and vice-versa) to keep the two in sync.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <div class="callout-label">Tip</div>
+      Excluding the blank reference screen, each output screen is treated as one processor. Splitting a
+      slice L / R or T / B is how you divide a wall across the ports of that processor before it moves
+      into LED Wiring.
+    </div>
+  </section>
+
+  <!-- Resolume XML -->
+  <section id="ao-xml" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Resolume XML — Import &amp; Export</h3>
+    <p>
+      Advanced Output speaks the same screen-setup format as Resolume Arena and Avenue.
+      <strong>Export XML</strong> writes every slice — its input crop, output position, size and
+      rotation — as a Resolume screen setup that can be loaded directly into the media server.
+      <strong>Import XML</strong> brings an existing Resolume setup back into PIXMAP so an already-built
+      show can be documented and wired.
+    </p>
+
+    <div class="callout info">
+      <div class="callout-label">Rotation Is Preserved</div>
+      When a slice is rotated in PIXMAP, the rotation is baked into the four corners of the exported
+      output rectangle — the convention Resolume reads — so the slice appears at the same angle and
+      position after importing into Resolume, not straightened out.
+    </div>
+  </section>
+
+  <!-- Using It — Steps -->
+  <section id="ao-steps" class="section" style="padding-top:48px;">
+    <h3 style="margin-top:0;">Using Advanced Output — Step by Step</h3>
+    <p>
+      A typical Advanced Output pass follows the same order every time: design first, then slice,
+      then arrange, then deliver.
+    </p>
+
+    <ol style="margin:20px 0 0; padding-left:20px; line-height:1.9;">
+      <li><strong>Open Advanced Output</strong> from a completed pixel-map project. The designed canvas becomes the composition.</li>
+      <li><strong>Add a screen</strong> for each physical video processor and set its output resolution.</li>
+      <li><strong>On Input Selection</strong>, position each slice's input rectangle over the region of the composition it should show.</li>
+      <li><strong>Switch to Output Transformation</strong> and place, scale, rotate and flip each slice onto the screen so it matches the real output.</li>
+      <li><strong>Split slices</strong> Left / Right or Top / Bottom where a wall spans multiple processor ports.</li>
+      <li><strong>Export</strong> — save a PNG map of the screen and/or Export XML into Resolume, then continue to LED Wiring for cabling and power.</li>
+    </ol>
+  </section>
+
+  <!-- ────────────────────────────────────────────
        BEST PRACTICES
        ──────────────────────────────────────────── -->
   <section id="best-practices" class="section">
-    <div class="eyebrow">05 · Reference</div>
+    <div class="eyebrow">06 · Reference</div>
     <h2>Best Practices</h2>
     <p>
       The following recommendations reflect production-tested habits that improve accuracy,
@@ -1704,7 +2091,7 @@ p:last-child { margin-bottom: 0; }
        FOOTER
        ──────────────────────────────────────────── -->
   <footer class="doc-footer">
-    <div class="brand"><span>PIX</span> MAP User Manual, 2026</div>
+    <div class="brand">PIXMAP User Manual, 2026</div>
     <div class="meta">LED Pixel Mapping · End-User Documentation</div>
   </footer>
 
@@ -1737,32 +2124,47 @@ p:last-child { margin-bottom: 0; }
   }, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
 
   targets.forEach(t => obs.observe(t.el));
-})();
-</script>
 
-<!-- Return to the homepage exactly where the visitor left off.
-     Same logic as the pricing / login pages: history.back() restores the
-     home page from the browser's back-forward cache (preserving scroll
-     position + scene state, no reload / intro replay). Falls back to a
-     normal navigation if the manual was opened directly. -->
-<script>
-(function () {
-  function goHome(e) {
-    if (e) e.preventDefault();
-    var fallback = setTimeout(function () {
-      window.location.href = '../../index.html';
-    }, 150);
-    window.addEventListener('pagehide', function () { clearTimeout(fallback); }, { once: true });
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      clearTimeout(fallback);
-      window.location.href = '../../index.html';
+  // Mobile navigation drawer toggle logic
+  const toggle = document.getElementById('manualNavToggle');
+  const nav = document.getElementById('nav');
+  const overlay = document.getElementById('manualNavOverlay');
+
+  if (toggle && nav && overlay) {
+    function toggleMenu() {
+      const isOpen = nav.classList.toggle('open');
+      toggle.classList.toggle('open', isOpen);
+      overlay.classList.toggle('open', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
     }
+
+    function closeMenu() {
+      nav.classList.remove('open');
+      toggle.classList.remove('open');
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    toggle.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    // Close menu when a navigation item is clicked
+    items.forEach(item => {
+      item.addEventListener('click', closeMenu);
+    });
   }
-  document.querySelectorAll('a.logo, a.back-to-site').forEach(function (a) {
-    a.addEventListener('click', goHome);
-  });
+
+  // Handle top back button click via history.back()
+  const topBackBtn = document.querySelector('.top-back-btn');
+  if (topBackBtn) {
+    topBackBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      setTimeout(function () {
+        window.location.href = '../../';
+      }, 300);
+      window.history.back();
+    });
+  }
 })();
 </script>
 

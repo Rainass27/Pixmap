@@ -8,6 +8,14 @@
 (function () {
   'use strict';
 
+  /* One-time reset of custom connector paths to load the corrected codebase defaults */
+  try {
+    if (localStorage.getItem('pixmap_usp_connectors_reset_v2') !== 'true') {
+      localStorage.removeItem('pixmap_usp_connectors_v1');
+      localStorage.setItem('pixmap_usp_connectors_reset_v2', 'true');
+    }
+  } catch (e) {}
+
   /* ---- USP Data ---- */
   var USP_DATA = [
     {
@@ -99,6 +107,15 @@
     'assets/images/BRAND LOGO INTEGRATION.PNG'     /* 09 BRAND LOGO INTEGRATION  */
   ];
 
+  /* USPs whose media should OVERLAY the sem1 image (centred on it, same size,
+     no border/chrome) instead of sitting below it. Indices 0,1,3,4,5,6 =
+     USP 1, 2, 4, 5, 6, 7 (the usp1/2/4/5/6/7 gifs). The rest stay below. */
+  var USP_MEDIA_OVERLAY = { 0: true, 1: true, 3: true, 4: true, 5: true, 6: true };
+
+  /* USPs where the small patch image (#patchFinal) is HIDDEN. USP 2,4,5,6,7
+     → indices 1,3,4,5,6. The rest (1,3,8,9,10) keep the patch visible. */
+  var USP_HIDE_PATCH = { 1: true, 3: true, 4: true, 5: true, 6: true };
+
   /* ---- Element references ---- */
   var uspSection   = document.getElementById('uspSection');
   var uspSticky    = document.getElementById('uspSticky');
@@ -116,12 +133,23 @@
 
   /* ---- Build card DOM ---- */
   var cards = [];
-  USP_DATA.forEach(function (usp) {
+  USP_DATA.forEach(function (usp, i) {
     var card = document.createElement('div');
     card.className = 'usp-card';
+    
+    var mediaHtml = '';
+    var mediaSrc = USP_MEDIA[i];
+    if (mediaSrc) {
+      var cls = (i === 7 || i === 8) ? 'usp-card-media usp-card-media-lg' : 'usp-card-media';
+      mediaHtml = '<div class="' + cls + '"><img src="' + encodeURI(mediaSrc) + '" alt=""></div>';
+    }
+    
     card.innerHTML =
       '<h3 class="usp-title">' + usp.title       + '</h3>' +
-      '<p  class="usp-desc">'  + usp.description  + '</p>';
+      '<div class="usp-card-body">' +
+        '<p  class="usp-desc">'  + usp.description  + '</p>' +
+        mediaHtml +
+      '</div>';
     uspCards.appendChild(card);
     cards.push(card);
   });
@@ -135,6 +163,9 @@
   USP_HL.forEach(function (r) {
     var hl = document.createElement('div');
     hl.className    = 'usp-highlight';
+    if (r.w < 3) {
+      hl.classList.add('usp-highlight-small');
+    }
     hl.style.left   = r.l.toFixed(3) + '%';
     hl.style.top    = r.t.toFixed(3) + '%';
     hl.style.width  = r.w.toFixed(3) + '%';
@@ -151,7 +182,10 @@
     if (!src) { mediaEls.push(null); return; }
     var img = document.createElement('img');
     /* USP 8 & 9 (indices 7,8) render a little larger — same position */
-    img.className = (i === 7 || i === 8) ? 'usp-media-img usp-media-lg' : 'usp-media-img';
+    var cls = (i === 7 || i === 8) ? 'usp-media-img usp-media-lg' : 'usp-media-img';
+    if (USP_MEDIA_OVERLAY[i]) cls += ' usp-media-over';   /* sits on the sem1 image */
+    if (i === 4) cls += ' usp-media-5';                   /* usp5.gif is taller — match width */
+    img.className = cls;
     img.src       = encodeURI(src);   /* handles spaces in filenames; gifs loop on their own */
     img.alt       = '';
     mediaWrap.appendChild(img);
@@ -211,6 +245,7 @@
 
     var W = window.innerWidth;
     var H = window.innerHeight;
+    var isMobile = W <= 820;
     pCtx.setTransform(pDpr, 0, 0, pDpr, 0, 0);
     pCtx.clearRect(0, 0, W, H);
 
@@ -265,8 +300,10 @@
       var lp = sampleFn(s / LINE_PTS);
       pCtx.lineTo(lp.x, lp.y);
     }
-    pCtx.strokeStyle = 'rgba(44,130,185,' + (alpha * 0.28).toFixed(3) + ')';
-    pCtx.lineWidth   = 2.8;
+    pCtx.strokeStyle = isMobile
+      ? 'rgba(68,175,229,' + (alpha * 0.82).toFixed(3) + ')'
+      : 'rgba(44,130,185,' + (alpha * 0.28).toFixed(3) + ')';
+    pCtx.lineWidth   = isMobile ? 1.4 : 1.8;
     pCtx.lineCap     = 'round';
     pCtx.lineJoin    = 'round';
     pCtx.stroke();
@@ -305,13 +342,13 @@
         var g = Math.round(175 + f * 73);  /* 175 → 248 */
         var b = Math.round(229 + f * 26);  /* 229 → 255 */
         pCtx.strokeStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + (alpha * f * 0.55).toFixed(3) + ')';
-        pCtx.lineWidth   = 1.2 + f * 2.2; /* thin tail → thick head     */
+        pCtx.lineWidth   = 0.8 + f * 1.4; /* thin tail → thick head     */
         pCtx.stroke();
       }
 
       /* Bright head dot — comet tip */
       pCtx.beginPath();
-      pCtx.arc(headPos.x, headPos.y, 2.0, 0, Math.PI * 2);
+      pCtx.arc(headPos.x, headPos.y, 1.4, 0, Math.PI * 2);
       pCtx.fillStyle = 'rgba(225,248,255,' + (alpha * 0.65).toFixed(3) + ')';
       pCtx.fill();
     }
@@ -323,22 +360,37 @@
   function easeInOut(t) {
     return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
   }
+  /* 1 = patch image shown for this USP, 0 = hidden */
+  function patchShown(i) {
+    return (i >= 0 && i < TOTAL && USP_HIDE_PATCH[i]) ? 0 : 1;
+  }
 
   /* ---- Layout: all cards above the patch image ---- */
   function computeLayout() {
     uspSection.style.height = (TOTAL * VH_PER_USP + 300) + 'vh';
-    /* Position card top edge just below the site header, well above sem1Bg */
+    var isMobile = window.innerWidth <= 820;
     var hdr = parseFloat(
       getComputedStyle(document.documentElement).getPropertyValue('--header-h')
     ) || 60;
-    var cardTop = Math.max(hdr + 160, 220) + 'px';
-    cards.forEach(function (card) {
-      card.style.left   = '50%';
-      card.style.right  = 'auto';
-      card.style.top    = cardTop;
-      card.style.bottom = 'auto';
-      card.style.width  = 'clamp(280px, 34vw, 460px)';
-    });
+    
+    if (isMobile) {
+      cards.forEach(function (card) {
+        card.style.left   = '50%';
+        card.style.right  = 'auto';
+        card.style.top    = 'auto';
+        card.style.bottom = 'calc(100vh - (50% + var(--header-h) / 2) + 15px)';
+        card.style.width  = 'min(86vw, 340px)';
+      });
+    } else {
+      var cardTop = Math.max(hdr + 80, 140) + 'px';
+      cards.forEach(function (card) {
+        card.style.left   = '50%';
+        card.style.right  = 'auto';
+        card.style.top    = cardTop;
+        card.style.bottom = 'auto';
+        card.style.width  = 'clamp(240px, 22vw, 320px)';
+      });
+    }
   }
 
   computeLayout();
@@ -361,6 +413,7 @@
       if (uspSticky)  uspSticky.classList.remove('active');
       if (uspOverlay) { uspOverlay.style.opacity = '0'; uspOverlay.classList.remove('dimmed'); }
       if (uspProgress) uspProgress.classList.remove('visible');
+      for (var k = 0; k < 10; k++) document.body.classList.remove('active-idx-' + k);
       cards.forEach(function (c) { c.style.opacity = '0'; });
       highlights.forEach(function (h) { h.style.opacity = '0'; });
       trailPath = null;
@@ -382,6 +435,7 @@
       if (uspSticky)  uspSticky.classList.remove('active');
       if (uspOverlay) { uspOverlay.style.opacity = '0'; uspOverlay.classList.remove('dimmed'); }
       if (uspProgress) uspProgress.classList.remove('visible');
+      for (var k = 0; k < 10; k++) document.body.classList.remove('active-idx-' + k);
       cards.forEach(function (c) { c.style.opacity = '0'; });
       highlights.forEach(function (h) { h.style.opacity = '0'; });
       trailPath = null;
@@ -395,6 +449,15 @@
 
     var scaled    = uspP * TOTAL;
     var activeIdx = Math.min(Math.floor(scaled), TOTAL - 1);
+    
+    for (var k = 0; k < 10; k++) {
+      if (k === activeIdx) {
+        document.body.classList.add('active-idx-' + k);
+      } else {
+        document.body.classList.remove('active-idx-' + k);
+      }
+    }
+    
     var stepT     = scaled - Math.floor(scaled);
 
     var inT     = easeInOut(clamp((stepT - 0.15) / 0.15, 0, 1));
@@ -424,12 +487,25 @@
       mediaEls.forEach(function (img, i) {
         if (img) img.style.opacity = (i === activeIdx) ? cardVis.toFixed(3) : '0';
       });
-      var anchorEl = (bgPatchFinal && bgPatchFinal.getBoundingClientRect().height > 10)
-        ? bgPatchFinal : bgSem1;
-      if (anchorEl) {
-        var aRect = anchorEl.getBoundingClientRect();
-        var topPx = Math.min(aRect.bottom + 64 * (window.innerHeight / 1080), window.innerHeight * 0.88);
-        mediaWrap.style.top = topPx.toFixed(0) + 'px';
+      if (USP_MEDIA_OVERLAY[activeIdx] && bgSem1) {
+        /* Overlay: centre the gif ON the sem1 image (the .usp-media-over img
+           carries translate(-50%,-50%), so this top is its centre line), then
+           nudge it a little DOWN from centre. */
+        var sRect = bgSem1.getBoundingClientRect();
+        var OVERLAY_DROP = sRect.height * 0.02;   /* push below centre a touch */
+        if (window.innerWidth > 820 && activeIdx === 4) {
+          OVERLAY_DROP += 45; // Shift down further to clear the description text on laptop
+        }
+        mediaWrap.style.top = (sRect.top + sRect.height / 2 + OVERLAY_DROP).toFixed(0) + 'px';
+      } else {
+        /* Below the patch image, as before. */
+        var anchorEl = (bgPatchFinal && bgPatchFinal.getBoundingClientRect().height > 10)
+          ? bgPatchFinal : bgSem1;
+        if (anchorEl) {
+          var aRect = anchorEl.getBoundingClientRect();
+          var topPx = Math.min(aRect.bottom + 64 * (window.innerHeight / 1080), window.innerHeight * 0.88);
+          mediaWrap.style.top = topPx.toFixed(0) + 'px';
+        }
       }
     } else {
       hideMedia();
@@ -443,11 +519,11 @@
        4. If it does: arc the bezier control point ABOVE the image top.
        5. If not (large centre highlights): gentle midpoint curve.
     ================================================================ */
+    var isMobile = window.innerWidth <= 820;
     var _customPaths = (window.PIXMAP && window.PIXMAP.uspConnectorPaths) || USP_CONNECTORS;
-    if (bgSem1 && cardVis > 0.005 &&
+    if (!isMobile && bgSem1 && cardVis > 0.005 &&
         _customPaths && _customPaths[activeIdx] && _customPaths[activeIdx].length >= 2) {
-      /* ── Custom straight-line polyline from the connector tool.
-         Points are image-relative %, converted to screen space here. ── */
+      /* ── Custom straight-line polyline from the connector tool on desktop. ── */
       var _sr = bgSem1.getBoundingClientRect();
       var _sp = _customPaths[activeIdx].map(function (p) {
         return { x: _sr.left + p.x / 100 * _sr.width, y: _sr.top + p.y / 100 * _sr.height };
@@ -467,64 +543,81 @@
       var cardCX   = (cardRect.left + cardRect.right)  / 2;
       var cardCY   = (cardRect.top  + cardRect.bottom) / 2;
 
-      /* Direction vector from highlight centre toward card */
-      var dxH  = cardCX - hlCX;
-      var dyH  = cardCY - hlCY;
+      var endX, endY;
+      /* Target the side of the description text dynamically */
+      var descEl = cardEl.querySelector('.usp-desc');
+      if (descEl) {
+        var descRect = descEl.getBoundingClientRect();
+        var descCX   = (descRect.left + descRect.right) / 2;
+        var descCY   = (descRect.top + descRect.bottom) / 2;
+
+        /* Route index 7 & 9 to the side, and divide others by screen halves */
+        if (activeIdx === 7 || activeIdx === 9 || hlCX < descCX) {
+          /* Point to the left side of the description */
+          endX = descRect.left - 6;
+          endY = descCY;
+        } else {
+          /* Point to the right side of the description */
+          endX = descRect.right + 6;
+          endY = descCY;
+        }
+      } else {
+        endX = cardCX;
+        endY = cardCY;
+      }
+
+      /* Direction vector from highlight centre toward target end point */
+      var dxH  = endX - hlCX;
+      var dyH  = endY - hlCY;
       var dist = Math.sqrt(dxH*dxH + dyH*dyH);
 
-      if (dist < 50) {
+      if (!isMobile && dist < 50) {
         /* Highlight essentially on top of card — no trail */
         trailPath = null;
       } else {
         /* ── Border exit point on the highlight rectangle ──
-           Cast a ray from the highlight centre toward the card and
-           find where it crosses the highlight's own border.          */
-        var hlHalfW = (hl.w / 100 * semRect.width)  / 2;
-        var hlHalfH = (hl.h / 100 * semRect.height) / 2;
+           Cast a ray from the highlight centre toward the target end point
+           and find where it crosses the highlight's own border.          */
+        var hlScale = 1.0;
+        if (isMobile && hl.w < 3) {
+          hlScale = 3.5;
+        }
+        var hlHalfW = hlScale * (hl.w / 100 * semRect.width)  / 2;
+        var hlHalfH = hlScale * (hl.h / 100 * semRect.height) / 2;
+        if (isMobile && hl.w < 3) {
+          hlHalfW = Math.max(hlHalfW, 16);
+          hlHalfH = Math.max(hlHalfH, 16);
+        }
+
         var htx     = hlHalfW / (Math.abs(dxH) || 0.001);
         var hty     = hlHalfH / (Math.abs(dyH) || 0.001);
         var hte     = Math.min(htx, hty);
         var startX  = hlCX + dxH * hte;   /* point ON the highlight border */
         var startY  = hlCY + dyH * hte;
 
-        /* ── Border entry point on the card ── */
-        var dxC  = hlCX - cardCX;
-        var dyC  = hlCY - cardCY;
-        var cw   = cardRect.width  / 2;
-        var ch   = cardRect.height / 2;
-        var ctx_ = cw / (Math.abs(dxC) || 0.001);
-        var cty  = ch / (Math.abs(dyC) || 0.001);
-        var cte  = Math.min(ctx_, cty);
-        var endX = cardCX + dxC * cte;
-        var endY = cardCY + dyC * cte;
-
-        /* Bezier control point — gentle bend based on highlight position */
-        var imgW   = (semRect.right - semRect.left) || 1;
-        var hlRelX = (hlCX - semRect.left) / imgW;
-        var midX   = (startX + endX) * 0.5;
-        var midY   = (startY + endY) * 0.5;
-        var cp;
-
-        /* Bend offsets scale with the editor image width so the connector
-           arc looks identical across screen sizes (≈55px / 28px at 1920). */
-        var bendH = imgW * 0.0404;
-        var bendV = imgW * 0.0206;
-
-        if (hlRelX < 0.18) {
-          cp = { x: midX - bendH, y: midY };
-        } else if (hlRelX > 0.82) {
-          cp = { x: midX + bendH, y: midY };
+        if ((activeIdx === 7 || activeIdx === 9) && isMobile) {
+          var sideMarginX = (endX < hlCX) ? (endX - 24) : (endX + 24);
+          trailPath = {
+            id: activeIdx,
+            pts: [
+              { x: startX,      y: startY },
+              { x: sideMarginX,  y: startY },
+              { x: sideMarginX,  y: endY   },
+              { x: endX,        y: endY   }
+            ],
+            alpha: cardVis
+          };
         } else {
-          cp = { x: midX, y: midY - bendV };
+          trailPath = {
+            id: activeIdx,
+            pts: [
+              { x: startX, y: startY },
+              { x: startX, y: endY   },
+              { x: endX,   y: endY   }
+            ],
+            alpha: cardVis
+          };
         }
-
-        trailPath = {
-          id:    activeIdx,
-          p0:    { x: startX, y: startY },  /* starts at highlight BORDER */
-          cp:    cp,
-          p1:    { x: endX,   y: endY   },
-          alpha: cardVis
-        };
       }
     } else {
       trailPath = null;
@@ -536,6 +629,15 @@
     if (bgPatchFinal) {
       bgPatchFinal.style.transform =
         'translateY(calc(-50% + 10px)) scale(' + (0.50 * pulseVal).toFixed(4) + ')';
+
+      /* Per-USP patch visibility — hidden for USP 2,4,5,6,7, shown otherwise.
+         Hold the current USP's state for most of the step, then crossfade to
+         the NEXT USP's state near the boundary (aligned with the card's exit),
+         so it fades in/out smoothly and continuously as you scroll. */
+      var curP  = patchShown(activeIdx);
+      var nextP = patchShown(activeIdx + 1 < TOTAL ? activeIdx + 1 : activeIdx);
+      var pT    = easeInOut(clamp((stepT - 0.70) / 0.20, 0, 1));
+      bgPatchFinal.style.opacity = (curP + (nextP - curP) * pT).toFixed(3);
     }
 
     /* Dim overlay + progress indicator — active during USP scroll */
