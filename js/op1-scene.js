@@ -260,9 +260,9 @@
     sem1Bg.style.opacity = '0';
     sem1Bg.style.visibility = 'hidden';
     if (patchFin) {
-      patchFin.style.opacity = '0';
-      patchFin.style.visibility = 'hidden';
-    }
+    patchFin.style.opacity = '0';
+    patchFin.style.visibility = 'hidden';
+}
   }
 
   function resetFinalLatch() {
@@ -321,13 +321,17 @@
     if (STATE === 'ANIMATING' && seqT0) {
       var el = (ts - seqT0) / 1000;
 
-      var bgOp = 1 - eio(clamp(el / S.BG_OUT, 0, 1));
-      sem1Bg.style.opacity = bgOp.toFixed(3);
-      sem1Bg.style.visibility = bgOp > 0.005 ? 'visible' : 'hidden';
-      if (patchFin) {
-        patchFin.style.opacity = bgOp.toFixed(3);
-        patchFin.style.visibility = bgOp > 0.005 ? 'visible' : 'hidden';
-      }
+      var startOp = window.PIXMAP.sem1StartOpacity ?? 1;
+      var bgOp = startOp * (1 - eio(clamp(el / S.BG_OUT, 0, 1)));
+
+sem1Bg.style.opacity = bgOp.toFixed(3);
+sem1Bg.style.visibility = bgOp > 0.005 ? 'visible' : 'hidden';
+
+// Never bring the patch back during the USP → OP1 transition.
+if (patchFin) {
+    patchFin.style.opacity = '0';
+    patchFin.style.visibility = 'hidden';
+}
 
       var textEl = el - S.TEXT_START;
       if (textEl >= 0 && wordSpans.length) {
@@ -438,9 +442,11 @@
 
     if (STATE === 'IDLE') {
       if (!anchor) return;
-      if ((window.scrollY - anchor) / window.innerHeight < 0.12) return;
+      if ((window.scrollY - anchor) / window.innerHeight < 0.02) return;
       savedAnchor = anchor;
       seqT0 = performance.now();
+      window.PIXMAP.sem1StartOpacity =
+    parseFloat(getComputedStyle(sem1Bg).opacity) || 1;
       STATE = 'ANIMATING';
       resetFinalLatch();
       window.PIXMAP = window.PIXMAP || {};

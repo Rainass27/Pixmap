@@ -487,10 +487,16 @@ if (bgPatchFinal) bgPatchFinal.style.opacity = '1';
     
     var stepT     = scaled - Math.floor(scaled);
 
-    var inT     = easeInOut(clamp((stepT - 0.15) / 0.15, 0, 1));
-    var outT    = easeInOut(clamp((stepT - 0.70) / 0.15, 0, 1));
+    var inT = easeInOut(clamp((stepT - 0.30) / 0.24, 0, 1));
+    var outT = easeInOut(clamp((stepT - 0.45) / 0.55, 0, 1));
     var cardVis = inT * (1 - outT);
-
+    if (bgSem1) {
+    if (activeIdx === TOTAL - 1) {
+        bgSem1.style.opacity = (1 - outT).toFixed(3);
+    } else {
+        bgSem1.style.opacity = '1';
+    }
+}
     /* Cards */
     cards.forEach(function (card, i) {
       if (i !== activeIdx) {
@@ -676,17 +682,18 @@ var patchFade = easeInOut(clamp((cardVis - 0.35) / 0.65, 0, 1));
 // Desktop: USP1 should not show the patch behind the GIF
 // Show patch only before USP1 starts.
 // Once USP1 is active, keep it completely hidden.
+// USP1: smoothly fade the patch away
 if (activeIdx === 0) {
-    bgPatchFinal.style.opacity = '0';
+    var introPatchFade = 1 - easeInOut(clamp(stepT / 0.40, 0, 1));
+    bgPatchFinal.style.opacity = introPatchFade.toFixed(3);
 }
-// Last USP fades out as before
+// Last USP fades out
 else if (activeIdx === TOTAL - 1 && stepT > 0.70) {
     bgPatchFinal.style.opacity = (1 - outT).toFixed(3);
 }
 // All other USPs
 else {
-    bgPatchFinal.style.opacity =
-        (curP * patchFade).toFixed(3);
+    bgPatchFinal.style.opacity = (curP * patchFade).toFixed(3);
 }
     }
 
