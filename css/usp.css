@@ -221,9 +221,9 @@
 
   /* USP 2 */
   .usp-media-img[src*="usp2.gif"] {
-    height: 13vh;
+    height: 15vh;
     max-height: none;
-    max-width: 52vw;
+    max-width: 48vw;
   }
 
   /* USP 4 */
