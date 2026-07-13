@@ -387,9 +387,26 @@ if (i === 9) cls += ' usp-media-brandlogo';
         card.style.width  = 'min(86vw, 340px)';
       });
     } else {
-      var isDesktop = window.innerWidth > 820;
-      var cardTop = (isDesktop ? Math.max(hdr + 160, 220) : Math.max(hdr + 80, 140)) + 'px';
-      var cardWidth = isDesktop ? 'clamp(280px, 34vw, 460px)' : 'clamp(240px, 22vw, 320px)';
+      var w = window.innerWidth;
+
+var cardTop;
+var cardWidth;
+
+if (w >= 1366) {
+    // Desktop
+    cardTop = Math.max(hdr + 160, 220) + 'px';
+    cardWidth = 'clamp(340px, 40vw, 560px)';
+}
+else if (w >= 821) {
+    // Laptop
+    cardTop = Math.max(hdr + 110, 170) + 'px';   // move text upward
+    cardWidth = 'clamp(340px, 40vw, 560px)';
+}
+else {
+    // Phone
+    cardTop = Math.max(hdr + 80, 140) + 'px';
+    cardWidth = 'clamp(240px, 22vw, 320px)';
+}
       cards.forEach(function (card) {
         card.style.left   = '50%';
         card.style.right  = 'auto';
@@ -571,15 +588,15 @@ var topPx = Math.min(
         var descCY   = (descRect.top + descRect.bottom) / 2;
 
         /* Route index 7 & 9 to the side, and divide others by screen halves */
-        if (activeIdx === 7 || activeIdx === 9 || hlCX < descCX) {
-          /* Point to the left side of the description */
-          endX = descRect.left - 6;
-          endY = descCY;
-        } else {
-          /* Point to the right side of the description */
-          endX = descRect.right + 6;
-          endY = descCY;
-        }
+        if (hlCX < descCX) {
+    // Highlight is on the left
+    endX = descRect.left - 18;
+    endY = descRect.top + 10;
+    } else {
+    // Highlight is on the right
+    endX = descRect.right + 18;
+    endY = descRect.top + 20;
+    }
       } else {
         endX = cardCX;
         endY = cardCY;
@@ -657,10 +674,12 @@ var topPx = Math.min(
 var patchFade = easeInOut(clamp((cardVis - 0.35) / 0.65, 0, 1));
 
 // Desktop: USP1 should not show the patch behind the GIF
-if (window.innerWidth >= 1366 && activeIdx === 0 && cardVis > 0.05) {
+// Show patch only before USP1 starts.
+// Once USP1 is active, keep it completely hidden.
+if (activeIdx === 0) {
     bgPatchFinal.style.opacity = '0';
 }
-// Last USP: fade patch away while exiting
+// Last USP fades out as before
 else if (activeIdx === TOTAL - 1 && stepT > 0.70) {
     bgPatchFinal.style.opacity = (1 - outT).toFixed(3);
 }
