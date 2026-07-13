@@ -702,3 +702,28 @@
   transform: translateY(-2px);
 }
 
+/* =========================================================
+   LARGE DESKTOPS
+   ========================================================= */
+@media (min-width: 1921px) {
+
+  #sem1Bg {
+    width: clamp(700px, 68vw, 1450px);
+  }
+
+  #op1Scene {
+    width: min(
+      clamp(700px, 70vw, 1500px),
+      calc((100vh - var(--header-h) - 120px) * 1.77778)
+    );
+  }
+
+  .op1-panel {
+    width: clamp(220px, 16vw, 300px);
+  }
+
+  #icon1 {
+    width: clamp(120px, 12vw, 220px);
+  }
+
+}

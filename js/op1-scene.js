@@ -100,7 +100,7 @@
     var vw = window.innerWidth, vh = window.innerHeight;
     var headerH = getHeaderHeight();
 
-    var capW    = Math.max(480, Math.min(0.78 * vw, 1160));   /* clamp(480,78vw,1160) */
+    var capW    = (vw >= 1366) ? Math.max(560, Math.min(0.90 * vw, 1360)) : Math.max(480, Math.min(0.78 * vw, 1160));
     var heightW = (vh - headerH - 120) * (16 / 9);
     var imgW    = Math.min(capW, heightW);
     var imgH    = imgW * 9 / 16;
@@ -300,11 +300,8 @@
          still valid after the collapse — see original op2 handoff notes:
          reserve at least a viewport's worth below this point so nothing
          jumps if the finale is shorter than the viewport. */
-      var footerEl = document.querySelector('.site-footer');
-      var belowH = (finalCta ? finalCta.offsetHeight : 0) +
-                   (footerEl ? footerEl.offsetHeight : 0);
       var noClampHeight = (window.scrollY + window.innerHeight) -
-                          uspSection.offsetTop - belowH;
+                          uspSection.offsetTop;
 
       var nextHeight = Math.max(0, idealHeight, noClampHeight);
       uspSection.style.height = px(nextHeight);
@@ -441,7 +438,7 @@
 
     if (STATE === 'IDLE') {
       if (!anchor) return;
-      if ((window.scrollY - anchor) / window.innerHeight < 0.20) return;
+      if ((window.scrollY - anchor) / window.innerHeight < 0.12) return;
       savedAnchor = anchor;
       seqT0 = performance.now();
       STATE = 'ANIMATING';

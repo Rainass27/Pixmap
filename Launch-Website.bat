@@ -1,7 +1,7 @@
 @echo off
 title PIXMAP Website Launcher
 cd /d "%~dp0"
-set "PORT=9000"
+set "PORT=8000"
 
 echo ============================================
 echo    PIXMAP - Local Website Launcher

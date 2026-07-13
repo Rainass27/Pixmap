@@ -82,6 +82,14 @@ p, li, h1, h2, h3, h4, h5, span, a, td, th { overflow-wrap: break-word; }
   }
 }
 
+/* Keep the closing PIXMAP message justified on laptop and desktop layouts. */
+@media (min-width: 901px) {
+  #finalCta p {
+    text-align: justify !important;
+    text-align-last: justify !important;
+  }
+}
+
 /* ---- 3c. Hero tagline: prevent crowding the logo on phones ---- */
 @media (max-width: 820px) {
   .hero-copy {
@@ -366,7 +374,38 @@ p, li, h1, h2, h3, h4, h5, span, a, td, th { overflow-wrap: break-word; }
 /* ------------------------------------------------------------
    ADDITIONAL MOBILE REINFORCEMENTS (width <= 600px)
    ------------------------------------------------------------ */
+/* Creative Masking (usp2.gif): scale down the wide demo on laptop screens. */
+@media (min-width: 821px) and (max-width: 1440px) {
+  body.active-idx-1 .usp-media-over {
+    width: 36vw !important;
+    max-width: 36vw !important;
+    height: auto !important;
+  }
+
+  /* Color Palette Picker (usp4.gif). */
+  body.active-idx-3 .usp-media-over {
+    width: 37vw !important;
+    max-width: 37vw !important;
+    height: auto !important;
+  }
+}
+
 @media (max-width: 600px) {
+  /* Keep USP demos comfortably within the phone viewport. Tablet and desktop
+     sizing remains controlled by the wider breakpoint above. */
+  #uspMedia {
+    width: clamp(78px, 28vw, 110px) !important;
+  }
+
+  .usp-media-img {
+    max-height: clamp(60px, 8vh, 80px) !important;
+  }
+
+  .usp-media-over {
+    max-width: 52vw !important;
+    height: 9vh !important;
+  }
+
   /* Prevent scroll behind nav */
   body.nav-open {
     overflow: hidden !important;
@@ -409,22 +448,124 @@ p, li, h1, h2, h3, h4, h5, span, a, td, th { overflow-wrap: break-word; }
     top: calc(50% + 80px) !important;
     font-size: clamp(0.82rem, 4vw, 1.05rem) !important;
   }
+
+  /* Targeted phone-only size overrides for specific feature gifs:
+     - CREATIVE MASKING (idx-1)
+     - COLOR PALETTE PICKER (idx-3)
+     - LABEL COLOR ASSIGNMENT (idx-5)
+     - MULTI-FORMAT BATCH EXPORT (idx-7) */
+  body.active-idx-0 #uspMedia,
+  body.active-idx-1 #uspMedia,
+  body.active-idx-3 #uspMedia,
+  body.active-idx-5 #uspMedia {
+    width: clamp(68px, 24vw, 105px) !important;
+  }
+  body.active-idx-0 .usp-media-over,
+  body.active-idx-1 .usp-media-over,
+  body.active-idx-3 .usp-media-over,
+  body.active-idx-5 .usp-media-over {
+    height: 8vh !important;
+  }
+  /* Creative Masking (usp2.gif): keep this wider-format demo narrower. */
+  body.active-idx-1 .usp-media-over {
+    width: 42vw !important;
+    max-width: 42vw !important;
+    height: auto !important;
+  }
+
+  /* Targeted phone-only size increases for UI dialog screenshots (making them readable on phone):
+     - MULTI-FORMAT BATCH EXPORT (idx-7)
+     - BRAND LOGO INTEGRATION (idx-9) */
+  body.active-idx-7 #uspMedia,
+  body.active-idx-9 #uspMedia {
+    width: clamp(190px, 68vw, 290px) !important;
+  }
+  body.active-idx-7 .usp-media-img,
+  body.active-idx-7 .usp-media-lg,
+  body.active-idx-9 .usp-media-img {
+    max-height: clamp(130px, 20vh, 210px) !important;
+  }
 }
 
 
 
 
-/* Mobile sizes override */
-@media (max-width: 820px) {
-  body.active-idx-3 #uspMedia,
-  body.active-idx-5 #uspMedia,
-  body.active-idx-6 #uspMedia {
-    width: clamp(80px, 30vw, 140px) !important;
+
+/* ------------------------------------------------------------
+   DESKTOP OPTIMIZATION LAYER
+   Adds more balanced spacing and readable sizing on larger
+   screens without touching the existing mobile or animation logic.
+   ------------------------------------------------------------ */
+@media (min-width: 1280px) {
+  .hero {
+    min-height: 100vh;
   }
-  body.active-idx-3 .usp-media-img,
-  body.active-idx-5 .usp-media-img,
-  body.active-idx-6 .usp-media-img {
-    max-height: clamp(65px, 9vh, 95px) !important;
+
+  #logo3d {
+    width: clamp(260px, 24vw, 420px);
+  }
+
+  #finalCta {
+    padding: 92px clamp(28px, 4vw, 64px) 112px;
+  }
+
+  .site-footer .container {
+    max-width: 1320px;
+    margin: 0 auto;
+  }
+
+  .foot-grid {
+    gap: clamp(24px, 3vw, 48px);
+    align-items: center;
+  }
+
+/* ------------------------------------------------------------
+   DESKTOP RESPONSIVE SCALE BACK LAYER (width >= 1366px)
+   Restores original desktop widths, margins, paddings, and font sizes
+   specifically on large desktop monitors.
+   ------------------------------------------------------------ */
+@media (min-width: 1366px) {
+  #sem1Bg {
+    width: clamp(560px, 90vw, 1360px) !important;
+  }
+
+  .usp-card {
+    width: clamp(280px, 34vw, 460px) !important;
+  }
+
+  .usp-title {
+    font-size: clamp(0.88rem, 1.50vw, 1.12rem) !important;
+    margin-bottom: 14px !important;
+  }
+
+  .usp-desc {
+    font-size: clamp(0.74rem, 0.98vw, 0.85rem) !important;
+    line-height: 1.85 !important;
+  }
+
+  .op1-panel {
+    width: clamp(190px, 17vw, 260px) !important;
+  }
+
+  .op1-panel-inner {
+    padding: 16px 18px 18px !important;
+    border-radius: 0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.28) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow:
+      0 2px  4px  rgba(0, 0, 0, 0.20),
+      0 8px  24px rgba(0, 0, 0, 0.45),
+      0 20px 48px rgba(0, 0, 0, 0.30),
+      inset 0  1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04) !important;
+  }
+
+  .op1-panel-desc {
+    line-height: 1.78 !important;
+    -webkit-line-clamp: unset !important;
+    line-clamp: none !important;
+    overflow: visible !important;
   }
 }
 

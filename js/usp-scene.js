@@ -32,7 +32,7 @@
     },
     {
       title: 'COLOR PALETTE PICKER',
-      description: 'Instantly select and apply colors via an integrated one-click palette — no manual hex input needed.'
+      description: 'Instantly select and apply colors via an integrated one-click palette, no manual hex input needed.'
     },
     {
       title: 'FIT CANVAS TO CONTENT',
@@ -140,7 +140,11 @@
     var mediaHtml = '';
     var mediaSrc = USP_MEDIA[i];
     if (mediaSrc) {
-      var cls = (i === 7 || i === 8) ? 'usp-card-media usp-card-media-lg' : 'usp-card-media';
+      var cls = 'usp-media-img';
+
+if (i === 7) cls += ' usp-media-multiformat';
+if (i === 8) cls += ' usp-media-lg';
+if (i === 9) cls += ' usp-media-brandlogo';
       mediaHtml = '<div class="' + cls + '"><img src="' + encodeURI(mediaSrc) + '" alt=""></div>';
     }
     
@@ -188,6 +192,7 @@
     img.className = cls;
     img.src       = encodeURI(src);   /* handles spaces in filenames; gifs loop on their own */
     img.alt       = '';
+    
     mediaWrap.appendChild(img);
     mediaEls.push(img);
   });
@@ -382,13 +387,15 @@
         card.style.width  = 'min(86vw, 340px)';
       });
     } else {
-      var cardTop = Math.max(hdr + 80, 140) + 'px';
+      var isDesktop = window.innerWidth > 820;
+      var cardTop = (isDesktop ? Math.max(hdr + 160, 220) : Math.max(hdr + 80, 140)) + 'px';
+      var cardWidth = isDesktop ? 'clamp(280px, 34vw, 460px)' : 'clamp(240px, 22vw, 320px)';
       cards.forEach(function (card) {
         card.style.left   = '50%';
         card.style.right  = 'auto';
         card.style.top    = cardTop;
         card.style.bottom = 'auto';
-        card.style.width  = 'clamp(240px, 22vw, 320px)';
+        card.style.width  = cardWidth;
       });
     }
   }
@@ -431,7 +438,7 @@
       ? (window.PIXMAP.uspCompleteScrollY || window.scrollY)
       : null;
 
-    if (raw < -0.02 || raw > 1.02) {
+    if (raw < -0.02) {
       if (uspSticky)  uspSticky.classList.remove('active');
       if (uspOverlay) { uspOverlay.style.opacity = '0'; uspOverlay.classList.remove('dimmed'); }
       if (uspProgress) uspProgress.classList.remove('visible');
@@ -442,10 +449,13 @@
       window.PIXMAP.uspPulseScale = 1;
       if (bgPatchFinal) bgPatchFinal.style.transform = '';
       hideMedia();
+      if (bgSem1) bgSem1.style.opacity = '1';
+if (bgPatchFinal) bgPatchFinal.style.opacity = '1';
       return;
     }
 
     if (uspSticky) uspSticky.classList.add('active');
+    if (bgSem1) bgSem1.style.opacity = '1';
 
     var scaled    = uspP * TOTAL;
     var activeIdx = Math.min(Math.floor(scaled), TOTAL - 1);
@@ -494,7 +504,7 @@
         var sRect = bgSem1.getBoundingClientRect();
         var OVERLAY_DROP = sRect.height * 0.02;   /* push below centre a touch */
         if (window.innerWidth > 820 && activeIdx === 4) {
-          OVERLAY_DROP += 45; // Shift down further to clear the description text on laptop
+          OVERLAY_DROP += 10; // Shift down further to clear the description text on laptop
         }
         mediaWrap.style.top = (sRect.top + sRect.height / 2 + OVERLAY_DROP).toFixed(0) + 'px';
       } else {
@@ -503,7 +513,16 @@
           ? bgPatchFinal : bgSem1;
         if (anchorEl) {
           var aRect = anchorEl.getBoundingClientRect();
-          var topPx = Math.min(aRect.bottom + 64 * (window.innerHeight / 1080), window.innerHeight * 0.88);
+          var offset = 64;
+
+if (activeIdx === 7 || activeIdx === 8) {
+    offset = 20;
+}
+
+var topPx = Math.min(
+    aRect.bottom + offset * (window.innerHeight / 1080),
+    window.innerHeight * 0.88
+);
           mediaWrap.style.top = topPx.toFixed(0) + 'px';
         }
       }
@@ -634,10 +653,22 @@
          Hold the current USP's state for most of the step, then crossfade to
          the NEXT USP's state near the boundary (aligned with the card's exit),
          so it fades in/out smoothly and continuously as you scroll. */
-      var curP  = patchShown(activeIdx);
-      var nextP = patchShown(activeIdx + 1 < TOTAL ? activeIdx + 1 : activeIdx);
-      var pT    = easeInOut(clamp((stepT - 0.70) / 0.20, 0, 1));
-      bgPatchFinal.style.opacity = (curP + (nextP - curP) * pT).toFixed(3);
+     var curP = patchShown(activeIdx);
+var patchFade = easeInOut(clamp((cardVis - 0.35) / 0.65, 0, 1));
+
+// Desktop: USP1 should not show the patch behind the GIF
+if (window.innerWidth >= 1366 && activeIdx === 0 && cardVis > 0.05) {
+    bgPatchFinal.style.opacity = '0';
+}
+// Last USP: fade patch away while exiting
+else if (activeIdx === TOTAL - 1 && stepT > 0.70) {
+    bgPatchFinal.style.opacity = (1 - outT).toFixed(3);
+}
+// All other USPs
+else {
+    bgPatchFinal.style.opacity =
+        (curP * patchFade).toFixed(3);
+}
     }
 
     /* Dim overlay + progress indicator — active during USP scroll */
